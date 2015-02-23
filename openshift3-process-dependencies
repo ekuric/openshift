@@ -1,0 +1,25 @@
+From /usr/lib/systemd/system we have 
+
+For openshift-master.service 
+-----------------------------
+After=network.target
+Requires=network.target
+
+For openshift-sdn-master 
+------------------------
+After=openshift-master.service
+Requires=openshift-master.service
+
+For openshift-sdn-node
+-------------------------
+Before=openshift-node.service
+After=openvswitch.service
+Requires=openvswitch.service
+
+For openshift-node
+---------------------------
+After=docker.service
+Requires=docker.service
+
+
+
