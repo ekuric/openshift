@@ -12,6 +12,8 @@ systemctl enable docker
 
 printf "%s\n" "Clonning kubernetes code and starting build"
 
+cd /root/
+
 git clone https://github.com/GoogleCloudPlatform/kubernetes
 cd kubernetes/build
 sed -i 's/KUBE_SKIP_CONFIRMATIONS\:\-n/KUBE_SKIP_CONFIRMATIONS\:\-y/' common.sh
