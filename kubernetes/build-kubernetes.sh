@@ -3,6 +3,12 @@
 printf "%s\n" "Script to download kubernets source and build binary files"
 printf "%s\n" "Supposed to run on RHEL based distributions"
 
+# check user
+if [ "$UID" -ne 0 ]; then
+    printf "%s\n" "You have to be root in order to run this script"
+    exit 0
+fi
+
 # install software
 
 yum install -y golang glibc-static device-mapper-devel btrfs-progs btrfs-progs-devel sqlite-devel docker git
