@@ -10,7 +10,7 @@ if [ "$UID" -ne 0 ]; then
     exit 0
 fi
 
-log_file=/root/build_kubernetes.log
+log_file=/root/build_kubernetes.$(date +%d.%m.%Y).log
 
 # install software
 
