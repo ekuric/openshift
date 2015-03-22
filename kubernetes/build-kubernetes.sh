@@ -4,32 +4,60 @@ printf "%s\n" "Script to download kubernets source and build binary files"
 printf "%s\n" "Supposed to run on RHEL based distributions"
 
 # check user
+
 if [ "$UID" -ne 0 ]; then
     printf "%s\n" "You have to be root in order to run this script"
     exit 0
 fi
 
+log_file=/root/build_kubernetes.log
+
 # install software
 
-yum install -y golang glibc-static device-mapper-devel btrfs-progs btrfs-progs-devel sqlite-devel docker git
+start_docker(){
 
-systemctl start docker
-systemctl enable docker
+    systemctl start docker | tee -a $log_file
+    systemctl enable docker | tee -a $log_file
+}
+
+install_software() {
+
+    if grep -q "^Fedora" /etc/redhat-release; then
+        echo "Installing on Fedora, we need docker-io"
+        yum install -y golang glibc-static device-mapper-devel btrfs-progs btrfs-progs-devel sqlite-devel docker-io git | tee -a $log_file
+        start_docker
+
+    elif egrep -q "release 6|release 7" /etc/redhat-release; then
+        echo "Installing on RHEL 6/CentoOS 6, or RHEL 7/CentOS 7 , docker package is named docker"
+        yum install -y golang glibc-static device-mapper-devel btrfs-progs btrfs-progs-devel sqlite-devel docker git | tee -a $log_file
+        start_docker
+
+    else
+        echo "we cannot determine platform used here, ... check it again"
+        exit 1
+    fi
+}
+
+install_software
 
 printf "%s\n" "Clonning kubernetes code and starting build"
 
 cd /root/
 
-git clone https://github.com/GoogleCloudPlatform/kubernetes
+git clone https://github.com/GoogleCloudPlatform/kubernetes | tee -a $log_file
 cd kubernetes/build
 sed -i 's/KUBE_SKIP_CONFIRMATIONS\:\-n/KUBE_SKIP_CONFIRMATIONS\:\-y/' common.sh
-./release.sh
+./release.sh | tee -a $log_file
 
 cd ~/kubernetes/_output/dockerized/bin/linux/amd64
 
 printf "%s\n" "Binaries are build and can be found in ~/kubernetes/_output/dockerized/bin/linux/amd64"
 
-ls -l
+for m in $(ls -l | awk '{print $NF}');do
+    sha256sum $m >> sha256sums.txt
+done
+
+ls -l | tee -a $log_file
 
 exit 0
 
