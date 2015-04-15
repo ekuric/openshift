@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+#
+#
+# Copyright (c) 2015 Elvir Kurić 
+#
+# This software is licensed to you under the GNU General Public License,
+# version 3 (GPLv3). There is NO WARRANTY for this software, express or
+# implied, including the implied warranties of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
+# along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
+#
+
 
 printf "%s\n" "Script to download kubernets source and build binary files"
 printf "%s\n" "Supposed to run on RHEL based distributions"
