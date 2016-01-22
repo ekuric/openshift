@@ -1,0 +1,65 @@
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "podfio",
+    "creationTimestamp": null,
+    "labels": {
+      "name": "hello-fio"
+    }
+  },
+  "spec": {
+    "containers": [
+      {
+        "name": "podfio",
+        "image": "fedssh",
+	"volumeMounts": [
+		{
+			"mountPath": "/mnt/ceph",
+			"name": "cephvol"
+		}
+	],
+        "ports": [
+          {
+            "containerPort": 22,
+            "protocol": "TCP"
+	  }
+        ],
+        "resources": {
+        },
+        "terminationMessagePath": "/dev/termination-log",
+        "imagePullPolicy": "IfNotPresent",
+        "capabilities": {},
+        "securityContext": {
+          "capabilities": {},
+          "privileged": true,	
+	  "command": "/usr/bin/init"
+        }
+      }
+    ],
+    "volumes": [
+      {
+        "name": "cephvol",
+        "rbd": {
+          "monitors": [
+            "192.168.122.101:6789",
+            "192.168.122.102:6789",
+            "192.168.122.103:6789"
+          ],
+          "pool": "ose-pool",
+          "image": "ose-elko",
+          "user": "admin",
+	  "secretRef": {
+			"name": "ceph-secret"
+		},
+          "fsType": "ext4",
+          "readOnly": false
+        }
+      }
+    ],
+    "restartPolicy": "Always",
+    "dnsPolicy": "ClusterFirst",
+    "serviceAccount": ""
+  },
+  "status": {}
+}
