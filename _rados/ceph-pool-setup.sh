@@ -82,8 +82,8 @@ done
 create_ceph_pool() {
     local imagenum=0
     # it is recommended to keep PG ( placemenet groups ) equeal to PGP placement groups for placement
-    PG_NUM=$(($OSDNUM*100/$REPLICA))
-    PGP_NUM=$(($OSDNUM*100/$REPLICA))
+    local PG_NUM=$(($OSDNUM*100/$REPLICA))
+    local PGP_NUM=$(($OSDNUM*100/$REPLICA))
     ceph osd pool create $pname $PG_NUM $PGP_NUM
     ceph osd pool set $pname size $REPLICA
 
@@ -92,9 +92,8 @@ create_ceph_pool() {
         rbd create image$imagenum --size $isize --pool $pname
         imagenum=$[$imagenum+1]
     done
-}
 
-list_pools() {
+    # list pools
     printf "Images created on ceph pool: $pname are as showed below\n"
     rbd ls -l $pname
 }
@@ -112,7 +111,7 @@ delete_pool() {
 # main
 case "$action" in
     c|create)
-        create_ceph_pool; list_pools
+        create_ceph_pool
     ;;
     d|delete)
         delete_pool
