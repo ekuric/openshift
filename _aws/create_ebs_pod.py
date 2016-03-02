@@ -5,6 +5,7 @@ import boto3
 import subprocess
 import os
 import json
+import sys
 
 def main():
 
@@ -44,18 +45,15 @@ def main():
     enumber = args.enumber
 
     session = boto3.Session(region_name=region)
-    ec2 =  boto3.resource("ec2")
+    ec2 = boto3.resource("ec2")
 
     def create_ebs_pod():
-        #global snumber
-        #snumber = 0
-        """ This function will do
-        - create ebs volume
-        - tag it
-        - use it to create pv and pvc from it in and attach it to pod
-        """
+
+        global snumber
+        snumber = args.snumber
+
         while snumber < enumber:
-            global snumber
+
             volume = ec2.create_volume(VolumeType=vtype,
                                        AvailabilityZone=region,
                                        Size=volumesize)
@@ -113,18 +111,16 @@ def main():
                          'spec': {'containers': [{'image': image,
                                                   'imagePullPolicy': 'IfNotPresent',
                                                   'name': "pod" + str(snumber),
-                                                  'volumeMounts': [{'name': 'pvolume' + str(enumber),
+                                                  'volumeMounts': [{'name': 'pvolume' + str(snumber),
                                                   'mountPath': mountpoint }]}],
                                                   'volumes': [{'persistentVolumeClaim': {'claimName': "pvclaim" + str(snumber)}, 'name': "pvolume" + str(snumber)}]}}
             poddoc.update(podvanila)
             json.dump(poddoc, open("podfile.json", "w+"))
             subprocess.call(["oc", "create", "-f", "podfile.json"])
             os.remove("podfile.json")
-            print ("Pods are created ...")
             subprocess.call(["oc", "get", "pods"])
 
-            snumber=snumber+1
-
+            snumber = snumber + 1
 
     create_ebs_pod()
 
