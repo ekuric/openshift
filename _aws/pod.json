@@ -1,0 +1,27 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "name": "podname",
+        "labels": {
+            "name": "podlabel"
+        }
+    },
+    "spec": {
+        "containers": [{
+            "name": "podname",
+            "image": "imagename",
+            "imagePullPolicy": "IfNotPresent",
+            "volumeMounts": [{
+                "mountPath": "/mountpoint",
+                "name": "volname"
+            }]
+        }],
+        "volumes": [{
+            "name": "volname",
+            "persistentVolumeClaim": {
+                "claimName": "claimname"
+            }
+        }]
+    }
+}
