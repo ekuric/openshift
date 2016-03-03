@@ -122,7 +122,6 @@ def main():
             json.dump(poddoc, open("podfile.json", "w+"))
             subprocess.call(["oc", "create", "-f", "podfile.json"])
             os.remove("podfile.json")
-            subprocess.call(["oc", "get", "pods"])
 
             minpod = minpod + 1
 
