@@ -66,7 +66,7 @@ def main():
             tags = ec2.create_tags(DryRun=False, Resources=[volume.id],
                                    Tags=[
                                        {'Key': tagprefix + volume.id,
-                                        'Value': tagprefix + volume.id
+                                        'Value': tagprefix
                                         },
                                    ])
 
