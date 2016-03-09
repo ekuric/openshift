@@ -6,6 +6,8 @@ import boto3
 import subprocess
 import os
 import json
+import time
+
 
 def main():
 
@@ -69,8 +71,13 @@ def main():
                                         'Value': tagprefix + volume.id
                                         },
                                    ])
+            # due to http://docs.aws.amazon.com/AWSEC2/latest/APIReference/query-api-troubleshooting.html#api-request-rate 
+            # adding time.sleep(15) - however this does not show issue fully, request limit rate can happen again, what is
+            # ihmo Amazon AWS issue 
+            print ("Sleeping 20 seconds ... while waiting read http://docs.aws.amazon.com/AWSEC2/latest/APIReference/query-api-troubleshooting.html#api-request-rate")
+            time.sleep(20)
+            # create pv 
 
-            # create pv ( add here try/except/finaly stuff - same for pvc / pod stanza
             try:
                 pvhandler = open(pvfile,"r")
             except IOError:
