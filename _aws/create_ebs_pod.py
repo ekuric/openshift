@@ -68,7 +68,7 @@ def main():
             tags = ec2.create_tags(DryRun=False, Resources=[volume.id],
                                    Tags=[
                                        {'Key': tagprefix + volume.id,
-                                        'Value': tagprefix + volume.id
+                                        'Value': tagprefix
                                         },
                                    ])
             # due to http://docs.aws.amazon.com/AWSEC2/latest/APIReference/query-api-troubleshooting.html#api-request-rate 
@@ -129,7 +129,6 @@ def main():
             json.dump(poddoc, open("podfile.json", "w+"))
             subprocess.call(["oc", "create", "-f", "podfile.json"])
             os.remove("podfile.json")
-            subprocess.call(["oc", "get", "pods"])
 
             minpod = minpod + 1
 
