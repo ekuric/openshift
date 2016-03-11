@@ -136,8 +136,6 @@ case "$mode" in
         collect_data
     ;; 
     stop)
-        collect_data_id=$(ps aux | pgrep collect_data)
-        kill -9 $collect_data_id
         for m in $(ps aux | grep pbench-tool-pprof-default | grep -v col | awk '{print $2}'); do kill -9 $m; done
     ;; 
     postprocess)
