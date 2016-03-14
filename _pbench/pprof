@@ -23,14 +23,10 @@ mode=""
 iteration="1"
 options="none"
 interval=10
-
-# add here upstream origin 
-
 origin_master="/etc/sysconfig/origin-master"
 origin_node="/etc/sysconfig/origin-node"
-
-openshift_master="/etc/sysconfig/atomic-openshift-master"
-openshift_node="/etc/sysconfig/atomic-openshift-node"
+ose_openshift_master="/etc/sysconfig/atomic-openshift-master"
+ose_openshift_node="/etc/sysconfig/atomic-openshift-node"
 
 opts=$(getopt -o d --longoptions "dir:,group:,iteration:,osecomponent:,start,stop,install,postprocess" -n "getopt.sh" -- "$@");
 
@@ -101,26 +97,46 @@ tool_pid_file=$pbench_tmp/$group.$iteration.$tool.pid
 tool_output_file=$tool_output_dir/$tool.txt
 export PPROF_TMPDIR=$tool_output_dir
 
+# function to setup openshift master or node file to support web profile, depending
+# is it Openshift Enterprise, or upstream Openshift Origin
 ose_pprof() {
     case "$osecomponent" in
         master)
-            if grep -q "^OPENSHIFT_PROFILE=web" $openshift_master; then
-                systemctl restart atomic-openshift-master.service
+            if [ -e $origin-master ]; then 
+                if grep -q "^OPENSHIFT_PROFILE=web" $origin_master; then
+                    systemctl restart openshift-master.service
+                else
+                    echo "OPENSHIFT_PROFILE=web" >> $origin_master
+                    systemctl restart openshift-master.service
+                fi
             else
-                echo "OPENSHIFT_PROFILE=web" >> $openshift_master
-                systemctl restart atomic-openshift-master.service
-            fi
-        ;;
+                if grep -q "^OPENSHIFT_PROFILE=web" $ose_openshift_master; then 
+                    systemctl restart atomic-openshift-master
+                else
+                    echo "OPENSHIFT_PROFILE=web" >> $ose_openshift_master
+                    systemctl restart atomic-openshift-master.service
+                fi
+            fi 
+            ;;
         node)
-            if grep -q "^OPENSHIFT_PROFILE=web" $openshift_node; then
-                systemctl restart atomic-openshift-node.service
+            if [ -e $origin-node ]; then 
+                if grep -q "^OPENSHIFT_PROFILE=web" $origin_node; then
+                    systemctl restart openshift-node.service
+                else
+                    echo "OPENSHIFT_PROFILE=web" >> $origin_node
+                    systemctl restart openshift-node.service
+                fi 
             else
-                echo "OPENSHIFT_PROFILE=web" >> $openshift_node
-                systemctl restart atomic-openshift-node.service
-            fi
-        ;;
+                if grep -q "^OPENSHIFT_PROFILE=web" $ose_openshift_node; then
+                    systemctl restart atomic-openshift-node.service
+                else
+                    echo "OPENSHIFT_PROFILE=web" >> $ose_openshift_node
+                    systemctl restart atomic-openshift-node.service
+                fi
+            fi 
     esac
 }
+
 collect_data() {
     while true; do
             $tool_package tool $tool -text -seconds=$interval -output $PPROF_TMPDIR/$(date +%Y-%m-%d:%H:%M:%S)_.txt http://localhost:6060/debug/pprof/profile
@@ -136,11 +152,12 @@ case "$mode" in
         collect_data
     ;; 
     stop)
-        for m in $(ps aux | grep pbench-tool-pprof-default | grep -v col | awk '{print $2}'); do kill -9 $m; done
+        # killing pprof processes at end on of itteration 
+        for pprof_process in $(ps aux | grep pbench-tool-$tool | grep -v grep | awk '{print $2}'); do kill -9 $pprof_process; done
     ;; 
     postprocess)
         printf "This script does not do any postprocessing\n"
-        printf "Data already collected" 
+        printf "Data already collected\n" 
         ls -l $tool_output_dir 
     ;; 
 esac 
