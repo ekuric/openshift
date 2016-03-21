@@ -81,7 +81,7 @@ class CreateEbs():
         pvvanila = { "metadata": {"name": "pvolume" + str(minpod) },
                      'spec': {'capacity': {'storage': volumesize },
                               'persistentVolumeReclaimPolicy': 'Recycle', 'accessModes': ['ReadWriteOnce'],
-                              'awsElasticBlockStore': {'volumeid': volumeid , 'fsType': 'ext4'}}}
+                              'awsElasticBlockStore': {'volumeID': volumeid , 'fsType': 'ext4'}}}
         pvjson.update(pvvanila)
         json.dump(pvjson, open("pvfile.json", "w+"),sort_keys=True, indent=4, separators=(',', ': '))
         subprocess.call(["oc", "create", "-f", "pvfile.json"])
