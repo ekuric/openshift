@@ -12,7 +12,7 @@ if [ -n "$podtag" ]; then
     	oc delete pod --grace-period=0 $pod
 	done
 elif [[ -z "$podtag" ]]; then
-	for pod in $(oc get pods | grep pod | awk '{print $1}'); do
+	for pod in $(oc get pods | grep ^pod | awk '{print $1}'); do
 		oc delete pod --grace-period=0 $pod
 	done
 else
