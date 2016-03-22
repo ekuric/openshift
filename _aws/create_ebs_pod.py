@@ -17,9 +17,7 @@ class CreateEbs():
 
     def __init__(self):
 
-        # create EC2 connector 
-        session = boto3.Session(region_name=region)
-        ec2 = boto3.resource("ec2")
+        print ("Class to create EBS volume")
 
     # create EC2 volume to be used later for pv/pvc and pod 
     # we create one EBS at time and tag it. Tags are only used for easier
@@ -31,12 +29,11 @@ class CreateEbs():
         self.vtype = vtype  
         self.region = "us-west-2b"
         self.tagprefix = tagprefix
-        
-        global tags
-        global volumeid 
 
-        session = boto3.Session(region_name=region)
+        global tags
+        global volumeid
         ec2 = boto3.resource("ec2")
+
         volume = ec2.create_volume(VolumeType=vtype,
                                        AvailabilityZone=region,
                                        Size=volumesize)
@@ -46,7 +43,7 @@ class CreateEbs():
         # volume created ... tag it for easier finding later - based on this tag
         # eventually, write volume.id to file and not use tagging - to reduce load on Amazon EC2 API 
         # more http://docs.aws.amazon.com/AWSEC2/latest/APIReference/query-api-troubleshooting.html#api-request-rate 
-        # adding time.sleep(10) - however this does not solve problem fully 
+        # adding time.sleep(10) - however this does not solve problem fully, but it is working workaround  
         print ("Sleep 10 seconds before tagging volume")
         time.sleep(10)
 
