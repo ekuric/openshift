@@ -15,19 +15,9 @@ import time
 
 class CreateEbs():
 
-    def __init__(self,volumesize,vtype,region,tagprefix,mountpoint,image,pvfile,pvcfile,podfile,minpod,maxpod):
+    def __init__(self):
 
-        self.volumesize = volumesize
-        self.vtype = vtype
-        self.region = region
-        self.tagprefix = tagprefix
-        self.mountpoint = mountpoint 
-        self.image = image
-        self.pvfile = pvfile
-        self.pvcfile = pvcfile
-        self.podfile = podfile
-        self.minpod = minpod
-        self.maxpod = maxpod
+        # create EC2 connector 
         session = boto3.Session(region_name=region)
         ec2 = boto3.resource("ec2")
 
@@ -35,13 +25,13 @@ class CreateEbs():
     # we create one EBS at time and tag it. Tags are only used for easier
     # retreival when we want to delete EBSes
 
-    def ec2_volume(self,volumesize,vtype,region,tagprefix,mountpoint):
+    def ec2_volume(self,volumesize,vtype,region,tagprefix):
 
         self.volumesize = 1
         self.vtype = vtype  
         self.region = "us-west-2b"
         self.tagprefix = tagprefix
-        self.mountpoint = "/mnt/persistentvolume"
+        
         global tags
         global volumeid 
 
@@ -106,12 +96,13 @@ class CreateEbs():
         os.remove("pvcfile.json")
 
     # create pod 
-    def ppod(self,image,maxpod,minpod,podfile):
+    def ppod(self,image,maxpod,minpod,podfile,mountpoint):
 
         self.image = image 
         self.maxpod = maxpod 
         self.minpod = minpod 
-        self.podfile = podfile 
+        self.podfile = podfile
+        self.mountpoint = mountpoint 
 
         try:
             podfile = open(self.podfile,"r")
@@ -164,13 +155,13 @@ if __name__ == "__main__":
     podfile = args.podfile
     action = args.action
     
-    create_ebs = CreateEbs(volumesize,vtype,region,tagprefix,mountpoint,image,pvfile,pvcfile,podfile,minpod,maxpod)
+    create_ebs = CreateEbs()
     total_pods = maxpod - minpod 
     while minpod < maxpod:
-        create_ebs.ec2_volume(volumesize,vtype,region,tagprefix,mountpoint)
+        create_ebs.ec2_volume(volumesize,vtype,region,tagprefix)
         create_ebs.pvolume(pvfile)
         create_ebs.pclaim(pvcfile)
-        create_ebs.ppod(image,maxpod,minpod,podfile)
+        create_ebs.ppod(image,maxpod,minpod,podfile,mountpoint)
         minpod = minpod + 1 
     
     print ( total_pods , "pods which use EBS as pessistent storage are created")
