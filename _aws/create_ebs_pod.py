@@ -17,7 +17,7 @@ class CreateEbs():
 
     def __init__(self):
 
-        print ("Class to create EBS volume")
+        print ("Program to create EBS volume and pv/pvc based on EBS")
 
     # create EC2 volume to be used later for pv/pvc and pod 
     # we create one EBS at time and tag it. Tags are only used for easier
@@ -25,9 +25,9 @@ class CreateEbs():
 
     def ec2_volume(self,volumesize,vtype,region,tagprefix):
 
-        self.volumesize = 1
+        self.volumesize = volumesize
         self.vtype = vtype  
-        self.region = "us-west-2b"
+        self.region = region 
         self.tagprefix = tagprefix
 
         global tags
@@ -54,7 +54,9 @@ class CreateEbs():
                                         },
                                    ])
     # create persistent volume 
-    def pvolume(self,pvfile):
+    # introduce check to stop if pvclaim is bigger than pvsize - cannot allocated such space 
+
+    def pvolume(self,pvfile,pvsize):
 
         self.pvfile = pvfile
         try:
@@ -65,8 +67,8 @@ class CreateEbs():
         # file is opened, now, json load it 
         pvjson = json.load(pvhandler)
         
-        pvvanila = { "metadata": {"name": "pvolume" + str(minpod) },
-                     'spec': {'capacity': {'storage': volumesize },
+        pvvanila = { "metadata": {"name": "p" + volumeid },
+                     'spec': {'capacity': {'storage': pvsize },
                               'persistentVolumeReclaimPolicy': 'Recycle', 'accessModes': ['ReadWriteOnce'],
                               'awsElasticBlockStore': {'volumeID': volumeid , 'fsType': 'ext4'}}}
         pvjson.update(pvvanila)
@@ -75,7 +77,7 @@ class CreateEbs():
         os.remove("pvfile.json")
 
     # create persistent volume claim 
-    def pclaim(self,pvcfile):
+    def pclaim(self,pvcfile,pvcsize):
 
         self.pvcfile = pvcfile
         try:
@@ -85,8 +87,8 @@ class CreateEbs():
 
 
         pvcjson = json.load(pvchandler)
-        pvcvanila = {'metadata': {"name":"pvclaim" + str(minpod)},
-                          'spec': {'accessModes': ['ReadWriteOnce'], 'resources': {'requests': {'storage': volumesize }}}}
+        pvcvanila = {'metadata': {"name":"p" + volumeid },
+                          'spec': {'accessModes': ['ReadWriteOnce'], 'resources': {'requests': {'storage': pvcsize }}}}
         pvcjson.update(pvcvanila)
         json.dump(pvcjson, open("pvcfile.json", "w+"),sort_keys=True, indent=4, separators=(',', ': '))
         subprocess.call(["oc", "create", "-f", "pvcfile.json" ])
@@ -94,6 +96,9 @@ class CreateEbs():
 
     # create pod 
     def ppod(self,image,maxpod,minpod,podfile,mountpoint):
+
+        global minpod 
+        global maxpod 
 
         self.image = image 
         self.maxpod = maxpod 
@@ -111,9 +116,9 @@ class CreateEbs():
                          'spec': {'containers': [{'image': image,
                                                   'imagePullPolicy': 'IfNotPresent',
                                                   'name': "pod" + str(minpod),
-                                                  'volumeMounts': [{'name': 'pvolume' + str(minpod),
+                                                  'volumeMounts': [{'name': 'p' + volumeid,
                                                   'mountPath': mountpoint }]}],
-                                                  'volumes': [{'persistentVolumeClaim': {'claimName': "pvclaim" + str(minpod)}, 'name': "pvolume" + str(minpod)}]}}
+                                                  'volumes': [{'persistentVolumeClaim': {'claimName': "pclaim" + volumeid }, 'name': "p" + volumeid }]}}
         podjson.update(podvanila)
         json.dump(podjson,  open("podfile.json", "w+"),sort_keys=True, indent=4, separators=(',', ': '))
         subprocess.call(["oc", "create", "-f", "podfile.json"])
@@ -122,9 +127,9 @@ class CreateEbs():
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Script to create OSE pods and attach one EBS volume per pod as persistent storage")
-    parser.add_argument("--volumesize", help="size of EBS voluems - in GB ", default=5, type=int)
+    parser.add_argument("--volumesize", help="size of EBS voluems - in GB, for kubernetes correct it 5Gi, 300Mi... etc", default=5)
     parser.add_argument("--vtype", help="EBS volume type, default is gp2", default="gp2")
-    parser.add_argument("--region", help="Amazon region where to connect", default="us-west-2b")
+    parser.add_argument("--region", help="Amazon region where to connect", default="us-west-2b", required=True)
     parser.add_argument("--image", help="docker image to use", default="r7perffio")
     parser.add_argument("--tagprefix", help="tag prefix for EBS volumes, default tag is openshift-testing-EBS_volume_id", default="openshift-testing")
     parser.add_argument("--mountpoint", help="mount point inside pod where EBS volume will be mounted, default is /mnt/persistentvolume", default="/mnt/persistentvolume")
@@ -136,6 +141,9 @@ if __name__ == "__main__":
     parser.add_argument("--pvfile", help="persistent volume definition json file - required parameter", required=True)
     parser.add_argument("--pvcfile", help="persistent volume claim definition json file - required parameter", required=True)
     parser.add_argument("--podfile", help="pod definition json file - required parameter", required=True)
+    parser.add_argument("--pvsize", help="persistent volume size - required parameter", required=True)
+    parser.add_argument("--pvcsize", help="persistent volume claim size - required parameter", required=True)
+
 
     args = parser.parse_args()
 
@@ -151,13 +159,16 @@ if __name__ == "__main__":
     pvcfile = args.pvcfile
     podfile = args.podfile
     action = args.action
+    pvsize = args.pvsize 
+    pvcsize = args.pvcsize 
+
     
     create_ebs = CreateEbs()
     total_pods = maxpod - minpod 
     while minpod < maxpod:
         create_ebs.ec2_volume(volumesize,vtype,region,tagprefix)
-        create_ebs.pvolume(pvfile)
-        create_ebs.pclaim(pvcfile)
+        create_ebs.pvolume(pvfile,pvsize)
+        create_ebs.pclaim(pvcfile,pvcsize)
         create_ebs.ppod(image,maxpod,minpod,podfile,mountpoint)
         minpod = minpod + 1 
     
