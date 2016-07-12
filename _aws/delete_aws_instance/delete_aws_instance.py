@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # script to start, stop, or delete/terminate EC2 instance on EC2 cloud based on instance name
+# License : GPL2
 __author__ = "elko"
 
 import boto3
@@ -43,8 +44,6 @@ class DeleteInstance():
                 try:
                     if str(instance.tags[0].values()[0]).startswith(iname):
                         print ("Starting instances with tag / name ", instance.tags)
-                        print (instance.id)
-                        sys.exit(0)
                         instance.start()
                 except TypeError:
                     print ("Exception happened - seems some instances are not taggeed --  we will proceed")
