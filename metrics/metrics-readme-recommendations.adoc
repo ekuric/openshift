@@ -1,0 +1,142 @@
+== Openshift Metrics sizing guidlines [ draft ]
+
+=== Openshift Metrics basics
+
+Monitoring openshift pods is important task from Openshift adminsitrator and Openshift user point
+of view. Openshift administrators need a way to monitor pods of interest and see how they perform and react if necessary
+to fix critical issue, and at other side Openshift users also need simple and comprehensive overview of pods where their
+application runs.
+
+This guide will provide basic Openshift metrics guidlines Openshift administrators and users can
+follow when trying to dimension metrics system for openshift installations
+
+=== Openshift Metrics installation
+
+Installation of Openshift metrics is described in https://docs.openshift.com/enterprise/3.2/install_config/cluster_metrics.html[Openshift Enterprise v3 documentation]
+For instruction how to configure Opensift Enterprise Metrics on functional Openshift cluster, please follow instruction
+in https://docs.openshift.com/enterprise/3.2/install_config/cluster_metrics.html[Openshift Enterprise documentation]
+
+However, it is very important to fulfill below points when starting Opensift metrics in order to avoid potential issues which can
+appear in later phase
+
+
+- use `persistant_storage=true` parameter. Persistent storage parameter is necessary if we want metrics
+data to persist across metrics pods lifetime. Prior using `persistant_storage=true` it is necessaary to have have available
+peristant volume. Please check https://docs.openshift.com/enterprise/3.2/dev_guide/persistent_volumes.html[Openshift Enterprise documentation - how to create persistant volume]
+for detailed instructions.
+Openshift metrics supports also https://github.com/openshift/origin-metrics/blob/master/metrics.yaml#L130[dynamically provisioned persistent volumes]
+Persistent Volumes ( PV ) and to use this feature Openshift metrics need to be started with
+`DYNAMICALLY_PROVISION_STORAGE=true`
+parameter. At time only EBS, GCE and Cinder storage backends can be used to dynamically
+provision persistent volumes for Openshift. For more inforamtion related to dynamicly provisioned Persistent Volumes, please check
+https://docs.openshift.com/enterprise/3.2/install_config/persistent_storage/dynamically_provisioning_pvs.html[Dynamically Provisioned PVS]
+
+
+If ```persistent_storage=true``` parameter is specified, then Openshift metrics will create PVC and use it
+as storage space for cassandra pod withing Openshift metrics.
+Please note that all what applies for cassandra database performances
+http://www.planetcassandra.org/blog/impact-of-shared-storage-on-cassandra/[cassandra link] for case it
+it is installed out of Openshift metrics, also applies on cassandra when deployed as part of Openshift Metrics
+
+- If `persistent_storage=false` is used with intention for metrics data not to live longer than pod lifetime,
+then it is recommended to design openshift installation to have `/var` on separate partition ( to accommodate `/lib/origin/openshift.local.volumes/pods`)
+This is necessary as space under `/var/lib/origin/openshift.local.volumes/pods` will be used for pods by default as location where to store pod data on Openshift nodes,
+and it is necessary to ensure that massive metrics data collection will not lead to filling up storage space on openshift node.
+This issue should be solved when issue https://github.com/kubernetes/kubernetes/pull/27199[Initial support for pod eviction based on disk usage] is closed
+
+At this point, we assume that metrics pods are up and running after starting metrics as showed in below example
+
+ # oc get pods -n openshift-infra
+ NAME                                          READY             STATUS      RESTARTS   AGE
+ hawkular-cassandra-1-l5y4g                    1/1               Running     0                 17h
+ hawkular-metrics-1t9so                        1/1               Running     0                 17h
+ heapster-febru                                1/1               Running     0                 17h
+
+if this is not the case, please check Openshift metrics documentation and ensure Openshift metrics pods are up and running.
+
+=== Openshift Metrics dimensioning best practices
+
+Openshift metrics uses Cassandra database as datastore for metrics and current version of Cassandra builtin in
+ Openshift metrics is `CASANDRA_VERSION=2.2.4` with `MAX_HEAP_SIZE=512M` and `NEW_HEAP_SIZE=100M`. It is assumed that these values should
+ cover most of Openshift metrics installations. It is possible to change these values in
+ https://github.com/openshift/origin-metrics/blob/master/cassandra/Dockerfile[cassandra docker file]
+ prior starting Openshift metrics
+
+
+Default time for Openshift metrics data preservation is specified with parameter `METRIC_DURATION`  in
+https://github.com/openshift/origin-metrics/blob/master/metrics.yaml[metrics.yaml configuration file] and has default value of 7 (days).
+This means Openshift metrics will keep data for 7 days before it start to purge old ones from cassandra database and to free
+up storage space.
+
+In tests where 1000 pods were monitored by Openshift metrics and latest Openshift metrics images, it was
+noticed that for 1000 pods during 24h metrics data collection will cause that cassandra storage space grow at around 2.5 GB.
+
+Based on tests we can say that Openshift Metrics will collect apprimately `0.1MB` of data per hour for Openshift pod
+
+```
+(((2.5*10^9)/1000)/24)/10^6 = 0.1 MB/hour
+```
+
+For the test case when 10000 pods were running in Openshift cluster ( across 120 nodes ) cassandra
+load grow up proportionally
+```
+(((11.410*10^9)/1000)/24)/10^6 = 0.4 MB/hour
+```
+
+[width="80%"]
+|================================================
+| |1000 pods| 10000 pods
+| Cassandra load during 24h time  |2.5GB| 11.4GB
+|
+|================================================
+
+
+Graphically these two test cases are presented on graph below
+
+image::https://raw.githubusercontent.com/ekuric/openshift/master/metrics/1_10kpods.png[1000 pods vs 10000 pods monitored during 24 h]
+
+If default value of 7 (days) for `METRIC_DURATION` and `METRIC_RESOLUTION` of 10 ( seconds ) are preserved,
+then it is expected to  that storage requiremetns for cassandra pod would be
+
+[width="80%"]
+|================================================
+| |1000 pods | 10000 pods
+| cassandra storage / week | 20GB | 100GB
+|================================================
+
+In last table, it was addded 1/5 expected storage space more - as buffer
+
+This value will grow up if more pods is monitored and/or if Openshift metrics parameters `METRIC_DURATION`  and/or `METRIC_RESOLUTION`
+are changed ( increase for `METRIC_DURATION` and decrease for `METRIC_RESOLUTION` parameter )
+
+=== Scaling Openshift Metrics pods
+
+One set of metrics pods ( one cassandra/hawkular/heapster pod ) monitored without issues up to 10k pods spread across 120
+openshift nodes.
+
+To scale out cassandra pods to count two replicas follow instructions in
+https://github.com/openshift/origin-metrics/blob/master/docs/cassandra_scaling.adoc[Openshift metrics documentation]
+
+If Openshhift metrics is deployed with `persistant_storage=true`, it is necessary before scaling out number of Openshift
+metrics cassandra pods to create PV ( Persistent Volume ) which will be used by newly created cassandra pods.
+This needs to be done prior scaling out number cassandra pods withing Openshift metrics system.
+Check https://docs.openshift.com/enterprise/3.2/dev_guide/persistent_volumes.html[Openshift Enterprise documentation - how to create persistant volume]
+for detailed instructions how to create PV ( Persistent Volume )
+
+To scale out number of Openshift metrics hawkualar pods to two replicas, run below command on openshift master
+
+```
+# oc scale -n openshift-infra --replicas=2 rc hawkular-metrics
+```
+
+It is recommended to pay attention on system load on nodes where Openshift metrics pods runs and based on that decide
+if it is necessary to scale out number of Openshift metrics pods and spread load across multiple Openshift nodes.
+
+
+=== HPA - Horizontal Pod Autoscaling
+
+Openshift Enterprise v.3.3 does not provide support https://docs.openshift.com/enterprise/3.2/dev_guide/pod_autoscaling.html[HPA - Horizontal Pod Autoscaling]
+for metrics pods and scalling metrics pods. In order to scale out number of Openshift metrics pods, it is necessary to scale them
+using https://docs.openshift.com/enterprise/3.2/dev_guide/pod_autoscaling.html[manual pod scaling] approach. Horizontal Pod Autoscaling for
+Openshift Metrics pods might be supported in future Openshift Enterprise releases.
+
