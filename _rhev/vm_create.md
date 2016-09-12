@@ -10,7 +10,7 @@
 
 #### USAGE
 
-For details how to use `add_vm_rhev.py` script refer to below help output
+For details how to use [add_vm_rhev.py](https://github.com/ekuric/openshift/blob/master/_rhev/add_vm_rhev.py) script refer to below help output
 ```
 # python add_vm_rhev.py  -h
 usage: add_vm_rhev.py [-h] --url URL --rhevusername RHEVUSERNAME
