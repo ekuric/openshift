@@ -112,7 +112,7 @@ python add_vm_rhev.py --url="https://rhv-m.local/ovirt-engine/api" --rhevusernam
 - m4.2xlarge : cores = 1, socket = 8, memory = 32 GB
 
 ```
-python add_vm_rhev.py --url="https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --vmtemplate="test-template" --disksize=1 --storagedomain=iSCSI --vmprefix=elko_node1   --num=1 --vmsockets=1 --memory=32
+python add_vm_rhev.py --url="https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --vmtemplate="test-template" --disksize=1 --storagedomain=iSCSI --vmprefix=elko_node1   --num=1 --vmsockets=8 --memory=32
 ```
 
 - m4.4xlarge : cores = 1, socket = 16, memory = 64 GB
