@@ -79,12 +79,14 @@ def vm_delete(vmprefix):
 
 def vm_collect_ip(vmprefix):
 	vmlist = api.vms.list()
-	ipvs=re.compile('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+#	ipvs=re.compile('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
 	for machine in vmlist:
 		info = machine.get_guest_info()
-		if info is not None and info.get_fqdn() is not None:
-			with open(str(vmprefix)+"fqdn", "a") as myfilefqdn:
-				myfilefqdn.write(info.get_fqdn() + "\n")
+		if machine.name.startswith(vmprefix):
+			if info is not None and info.get_fqdn() is not None:
+				with open(str(vmprefix)+"fqdn", "a") as myfilefqdn:
+					myfilefqdn.write(info.get_fqdn() + "\n")
+"""
 			if machine.guest_info != None:
 				ips = machine.guest_info.get_ips()
 				for ip in ips.get_ip():
@@ -92,6 +94,7 @@ def vm_collect_ip(vmprefix):
 					if re.search(ipvs,ipaddr):
 						with open(str(vmprefix) + "ips", "a") as myfileip:
 							myfileip.write(ipaddr + "\n")
+"""
 
 
 if action == "start":
