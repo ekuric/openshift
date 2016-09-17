@@ -25,6 +25,9 @@ parser.add_argument("--vmsockets", help=" How many sockets VM machine will have 
 
 parser.add_argument("--storagedomain", help="which storage domain to use for space when allocating storage for VM"
                                             " If not sure which one - check web interface and/or contact RHEV admin", required=True, default="iSCSI")
+
+parser.add_argument("--network", help="Where to connect eth0 network interface"
+									  " network specified here has to be present in RHEV environment prior trying to create virtual machines, default is ovirtmgmt network", default="ovirtmgmt")
 args = parser.parse_args()
 
 url=args.url
@@ -42,6 +45,7 @@ disksize = args.disksize
 storagedomain = args.storagedomain
 vmcores = args.vmcores
 vmsockets = args.vmsockets
+network = args.network
 
 # basic configurations / functions
 
@@ -60,13 +64,13 @@ def wait_disk_state(disk_name, state):
     while api.disks.get(disk_name).status.state != state:
         time.sleep(1)
 
-def create_vm(vmprefix,disksize, storagedomain,vmcores,vmsockets):
+def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets):
 	print ("------------------------------------------------------")
 	print ("Creating", num, "RHEV based virtual machines")
 	print ("-------------------------------------------------------")
 	for machine in range(0,int(num)):
 		try:
-			vm_name = str(vmprefix) + "_" + str(machine) + "_cores_" + str(vmcores) + "_sockets_" + str(vmsockets)
+			vm_name = str(vmprefix) + "_" + str(machine) + "_sockets_" + str(vmsockets)
 			vm_memory = int(memory)*1024*1024*1024
 			vm_cluster = api.clusters.get(name=cluster)
 			vm_template = api.templates.get(name=vmtemplate)
@@ -75,7 +79,7 @@ def create_vm(vmprefix,disksize, storagedomain,vmcores,vmsockets):
 			vm_params = params.VM(name=vm_name,memory=vm_memory,cluster=vm_cluster,template=vm_template,os=vm_os,cpu=cpu_params)
 			print ("creating virtual machine", vm_name)
 			api.vms.add(vm=vm_params)
-			api.vms.get(vm_name).nics.add(params.NIC(name=nicname, network=params.Network(name='ovirtmgmt'), interface='virtio'))
+			api.vms.get(vm_name).nics.add(params.NIC(name=nicname, network=params.Network(name=network), interface='virtio'))
 			print ("Virtual machine created: ", vm_name, "and it has parameters"," memory:", memory,"[GB]",
 				   " cores:", vmcores,
 				   " sockets", vmsockets,
@@ -105,5 +109,5 @@ def create_vm(vmprefix,disksize, storagedomain,vmcores,vmsockets):
 			print ("Adding virtual machine '%s' failed: %s", vm_name, e)
 
 
-create_vm(vmprefix, disksize, storagedomain, vmcores, vmsockets)
+create_vm(vmprefix, disksize, storagedomain,network, vmcores, vmsockets)
 api.disconnect()
