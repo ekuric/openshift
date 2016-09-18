@@ -63,18 +63,19 @@ def vm_stop(vmprefix):
 
 # delete VMs
 def vm_delete(vmprefix):
-    try:
-        vmlist = api.vms.list(max=500)
-        for machine in vmlist:
-            if api.vms.get(machine.name).status.state == 'up' and machine.name.startswith(vmprefix):
-                print ("Machine:", machine.name, "is runnning, check web" , url,"running machines will not be deleted"
-																				"exiting...")
-                sys.exit()
-            elif api.vms.get(machine.name).status.state != 'up' and machine.name.startswith(vmprefix):
-                api.vms.get(machine.name).delete()
-                print ("Deleting machine", machine.name)
-    except Exception as e:
-        print ("Failed to delete virtual machine", machine.name,"check web:", url)
+	try:
+		vmlist = api.vms.list(max=500)
+		for machine in vmlist:
+			if api.vms.get(machine.name).status.state == 'up' and machine.name.startswith(vmprefix):
+				print ("Machine:", machine.name, "is runnning, check web" , url,"running machines will not be deleted - stop them first and run script again")
+			elif api.vms.get(machine.name).status.state == 'down' and machine.name.startswith(vmprefix):
+				api.vms.get(machine.name).delete()
+				print ("Deleted machine", machine.name)
+			elif api.vms.get(machine.name).status.state == 'not_responding' and machine.name.startswith(vmprefix):
+				print ("Stopping machine", machine.name, "This machine was in notresponding status,stopping it, ... check machine: ", machine.name)
+				api.vms.get(machine.name).stop()
+	except Exception as e:
+		print ("Failed to delete virtual machine", machine.name,"check web:", url)
 
 
 def vm_collect_ip(vmprefix):
