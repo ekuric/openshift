@@ -55,6 +55,12 @@ optional arguments:
                         storage for VM If not sure which one - check web
                         interface and/or contact RHEV admin
 
+  --network NETWORK     Where to connect eth0 network interface network
+                          specified here has to be present in RHEV environment
+                          prior trying to create virtual machines, default is
+                          ovirtmgmt network
+
+
 ```
 
 It is assumed that only one core per socket hardware supports, in all examples below it is
