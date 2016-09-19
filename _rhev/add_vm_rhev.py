@@ -37,7 +37,6 @@ rhevcafile = args.rhevcafile
 memory = args.memory
 cluster = args.cluster
 vmtemplate = args.vmtemplate
-vmlistfile = args.vmlistfile
 nicname = args.nicname
 vmprefix = args.vmprefix
 num = args.num
