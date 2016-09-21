@@ -52,11 +52,9 @@ def vm_stop(vmprefix):
             if api.vms.get(machine.name).status.state == 'up' and machine.name.startswith(vmprefix):
                 print ("Stopping machine", machine.name)
                 api.vms.get(machine.name).stop()
-            elif api.vms.get(machine.name).status.state != 'up' and machine.name.startswith(vmprefix):
-                print ("Machine name", machine.name, "is already stopped")
-            else:
-                print ("Machine is already stopped", machine.name)
-
+            elif api.vms.get(machine.name).status.state == 'non_responding' and machine.name.startswith(vmprefix):
+                print ("machine", machine.name, "is in nonresponding state, stopping it")
+                api.vms.get(machine.name).stop()
     except Exception as e:
         print ("failed to stop Virtual machine", machine, "check it via web interface", url)
 
