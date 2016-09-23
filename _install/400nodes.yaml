@@ -1,0 +1,465 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+lb
+[OSEv3:vars]
+#The following parameters is used by post-actions
+use_rpm_playbook=true
+openshift_playbook_rpm_repos=[{'id': 'aos-playbook-rpm', 'name': 'aos-playbook-rpm', 'baseurl': 'http://xyz.com/RHAOS/AtomicOpenShift/3.3/latest/RH7-RHAOS-3.3/x86_64/os', 'enabled': 1, 'gpgcheck': 0}]
+update_is_images_url=registry.xyz.com
+
+#The following parameters is used by openshift-ansible
+ansible_ssh_user=root
+
+openshift_master_default_subdomain_enable=true
+openshift_auth_type=htpasswd
+
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/htpasswd'}]
+
+deployment_type=openshift-enterprise
+oreg_url=registry.xyz.com/openshift3/ose-${component}:${version}
+openshift_docker_additional_registries=registry.xyz.com
+openshift_docker_insecure_registries=registry.xyz.com
+use_cluster_metrics=false
+osm_use_cockpit=false
+
+openshift_master_cluster_method=native
+openshift_master_portal_net=172.24.0.0/14
+osm_cluster_network_cidr=172.20.0.0/14
+osm_host_subnet_length=8
+
+openshift_node_kubelet_args={"max-pods": ["250"],"minimum-container-ttl-duration": ["10s"], "maximum-dead-containers-per-container": ["1"], "maximum-dead-containers": ["20"], "image-gc-high-threshold": ["80"], "image-gc-low-threshold": ["70"]}
+
+openshift_registry_selector="region=infra,zone=default"
+openshift_hosted_router_selector="region=infra,zone=default"
+openshift_hosted_router_registryurl=registry.xyz.com/openshift3/ose-${component}:${version}
+debug_level=2
+openshift_set_hostname=true
+openshift_override_hostname_check=true
+os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
+openshift_master_cluster_method=native
+
+openshift_master_cluster_hostname=dhcp6-254.example.net
+openshift_master_cluster_public_hostname=dhcp6-254.example.net
+
+[lb]
+dhcp6-254.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey"
+
+[etcd]
+dhcp7-241.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-241.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}" 
+dhcp7-237.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-237.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}" 
+dhcp7-239.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-239.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}" 
+
+[masters]
+dhcp7-241.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-241.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}" 
+dhcp7-237.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-237.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}" 
+dhcp7-239.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-239.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}" 
+
+[nodes]
+dhcp7-241.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-241.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}"  openshift_scheduleable=false
+dhcp7-237.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-237.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}"  openshift_scheduleable=false
+dhcp7-239.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp7-239.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}"  openshift_scheduleable=false
+dhcp6-254.example.net ansible_user=root ansible_ssh_user=root ansible_ssh_private_key_file="/root/.ssh/id_rsa_mykey" openshift_public_hostname=dhcp6-254.example.net openshift_node_labels="{'region': 'infra', 'zone': 'default'}"  openshift_scheduleable=true 
+
+172.16.6.206 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.60 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.61 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.62 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.63 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.64 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.65 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.66 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.67 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.68 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.69 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.219 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.70 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.71 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.72 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.73 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.74 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.75 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.76 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.77 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.78 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.79 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.220 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.80 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.81 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.82 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.83 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.84 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.85 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.86 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.87 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.88 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.89 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.221 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.90 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.91 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.92 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.93 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.94 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.95 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.96 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.97 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.98 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.99 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.222 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.100 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.101 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.102 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.103 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.104 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.105 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.106 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.107 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.108 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.109 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.223 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.110 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.111 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.112 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.113 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.114 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.115 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.116 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.117 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.118 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.119 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.224 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.120 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.121 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.122 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.123 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.124 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.125 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.126 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.127 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.128 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.129 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.225 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.130 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.131 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.132 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.133 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.134 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.135 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.136 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.137 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.138 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.139 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.227 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.140 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.141 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.142 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.143 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.144 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.145 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.146 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.147 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.148 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.149 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.228 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.150 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.151 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.152 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.153 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.154 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.155 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.156 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.157 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.158 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.159 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.229 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.207 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.160 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.161 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.162 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.163 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.164 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.165 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.166 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.167 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.168 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.169 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.230 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.170 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.171 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.172 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.173 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.174 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.175 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.177 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.178 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.179 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.231 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.180 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.181 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.183 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.184 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.185 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.186 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.187 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.188 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.189 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.232 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.190 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.191 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.192 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.193 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.194 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.195 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.196 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.197 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.198 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.199 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.233 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.200 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.201 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.202 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.203 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.204 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.205 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.206 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.207 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.208 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.209 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.234 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.210 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.211 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.212 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.213 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.214 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.215 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.216 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.217 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.218 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.219 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.235 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.220 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.221 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.222 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.223 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.224 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.225 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.226 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.227 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.228 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.229 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.236 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.230 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.231 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.232 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.233 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.234 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.235 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.236 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.238 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.240 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.242 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.237 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.243 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.244 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.245 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.246 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.247 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.248 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.249 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.250 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.251 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.252 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.238 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.253 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.254 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.1 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.2 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.3 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.4 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.5 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.6 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.7 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.8 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.239 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.209 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.9 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.10 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.11 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.12 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.13 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.14 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.15 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.16 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.17 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.18 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.240 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.19 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.20 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.21 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.22 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.23 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.241 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.242 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.243 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.244 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.245 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.246 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.247 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.248 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.249 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.211 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.250 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.251 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.252 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.253 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.1 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.3 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.5 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.7 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.8 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.9 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.213 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.10 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.11 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.12 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.13 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.14 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.15 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.16 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.17 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.18 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.19 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.214 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.20 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.21 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.22 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.23 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.24 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.25 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.26 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.27 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.28 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.29 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.215 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.30 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.31 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.32 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.33 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.34 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.35 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.36 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.37 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.38 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.39 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.216 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.40 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.41 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.42 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.43 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.44 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.45 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.46 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.47 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.48 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.49 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.217 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.50 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.51 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.53 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.54 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.55 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.56 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.57 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.7.58 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.6.218 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.24 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.34 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.35 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.36 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.37 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.38 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.39 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.40 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.41 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.42 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.43 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.25 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.44 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.45 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.46 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.47 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.48 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.49 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.50 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.51 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.52 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.53 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.26 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.54 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.55 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.56 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.57 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.58 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.59 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.60 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.61 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.62 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.63 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.27 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.64 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.65 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.66 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.67 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.68 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.69 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.70 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.71 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.72 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.73 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.28 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.74 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.75 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.76 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.77 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.78 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.79 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.80 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.81 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.82 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.83 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.29 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.84 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.85 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.86 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.87 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.88 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.89 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.90 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.91 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.92 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.93 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.30 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.94 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.95 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.96 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.97 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.98 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.99 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.100 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.101 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.102 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.103 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.31 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.104 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.105 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.106 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.107 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.32 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.33 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.108 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.109 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.110 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+172.16.8.111 ansible_ssh_user=root ansible_ssh_private_key_file=/root/.ssh/id_rsa_mykey openshift_node_labels="{'region': 'primary', 'zone': 'default'}" openshift_scheduleable=true
+ 
+[nfs]
