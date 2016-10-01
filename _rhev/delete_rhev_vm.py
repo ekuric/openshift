@@ -39,8 +39,6 @@ def vm_start(vmprefix):
                 api.vms.get(machine.name).start()
             elif api.vms.get(machine.name).status.state == 'up' and machine.name.startswith(vmprefix):
                 print ("Machine:", machine.name , "is already up and running")
-            else:
-                print ("Machine:", machine.name, "is already started, check url", url)
     except Exception as e:
         print ("Failed to start Virtual machine", machine, "check it via web interface ", url)
 

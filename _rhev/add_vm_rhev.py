@@ -24,10 +24,11 @@ parser.add_argument("--vmcores", help="How many cores VM machine will have - def
 parser.add_argument("--vmsockets", help=" How many sockets VM machine will have - default 1 ", default=1)
 
 parser.add_argument("--storagedomain", help="which storage domain to use for space when allocating storage for VM"
-                                            " If not sure which one - check web interface and/or contact RHEV admin", required=True, default="iSCSI")
+                                            " If not sure which one - check web interface and/or contact RHEV admin", default="iSCSI")
 
 parser.add_argument("--network", help="Where to connect eth0 network interface"
 									  " network specified here has to be present in RHEV environment prior trying to create virtual machines, default is ovirtmgmt network", default="ovirtmgmt")
+parser.add_argument("--addstorage", help="wheather or not to attach additional storage from storage domain to this VM", default="no")
 args = parser.parse_args()
 
 url=args.url
@@ -45,6 +46,7 @@ storagedomain = args.storagedomain
 vmcores = args.vmcores
 vmsockets = args.vmsockets
 network = args.network
+addstorage = args.addstorage
 
 # basic configurations / functions
 
@@ -63,7 +65,7 @@ def wait_disk_state(disk_name, state):
     while api.disks.get(disk_name).status.state != state:
         time.sleep(1)
 
-def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets):
+def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets,addstorage):
 	print ("------------------------------------------------------")
 	print ("Creating", num, "RHEV based virtual machines")
 	print ("-------------------------------------------------------")
@@ -82,31 +84,35 @@ def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets):
 			print ("Virtual machine created: ", vm_name, "and it has parameters"," memory:", memory,"[GB]",
 				   " cores:", vmcores,
 				   " sockets", vmsockets,
-				   " waiting on machine to unlock so we can attach disk to it")
+				   " waiting on machine to unlock so we proceed with configuration")
 			wait_vm_state(vm_name, "down")
 			diskname = "disk_" + str(vmprefix) + str(machine)
 
-			api.vms.get(vm_name).disks.add(params.Disk(name=diskname, storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
-															size=int(disksize)*1024*1024*1024,
-															status=None,
-															interface='virtio',
-															format='cow',
-															sparse=True,
-															bootable=False))
-			# if disk is not in "OK" state ... wait here - we cannot start machine if this is not the case
-			print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
+			if addstorage == "yes":
+				api.vms.get(vm_name).disks.add(params.Disk(name=diskname, storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
+														   size=int(disksize)*1024*1024*1024,
+														   status=None,
+														   interface='virtio',
+														   format='cow',
+														   sparse=True,
+														   bootable=False))
+				# if disk is not in "OK" state ... wait here - we cannot start machine if this is not the case
+				print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
 				   " starting machine with disk attached to VM and same time having disk in Locked state will result in machine start failure")
-			wait_disk_state(diskname,"ok")
+				wait_disk_state(diskname,"ok")
 
-			print ("Machine", vm_name, "is ready to be started")
-			api.vms.get(vm_name).start()
-			print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
+				print ("Machine", vm_name, "is ready to be started")
+				api.vms.get(vm_name).start()
+				print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
 				   " cores:", vmcores,
 				   " sockets", vmsockets,
 				   " storage disk", disksize, "[GB]")
+			elif addstorage == "no":
+				print ("addstorage=no was specified for", vm_name,"no additional disk will be added, starting VM:", vm_name)
+				api.vms.get(vm_name).start()
 		except Exception as e:
 			print ("Adding virtual machine '%s' failed: %s", vm_name, e)
 
 
-create_vm(vmprefix, disksize, storagedomain,network, vmcores, vmsockets)
+create_vm(vmprefix, disksize, storagedomain,network, vmcores, vmsockets, addstorage)
 api.disconnect()

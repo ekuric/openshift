@@ -59,7 +59,9 @@ optional arguments:
                           specified here has to be present in RHEV environment
                           prior trying to create virtual machines, default is
                           ovirtmgmt network
-
+  --addstorage ADDSTORAGE
+                          wheather or not to attach additional storage from
+                          storage domain to this VM
 
 ```
 
@@ -101,6 +103,12 @@ Tag all machines with `openshift_master` prefix
 
 ```
 # python add_vm_rhev.py --url="RHEV_API_WEB - eg https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --memory=16  --vmtemplate="test-template" --disksize=50 --storagedomain=iSCSI --vmsockets=16 --vmprefix=openshift_master --num=3
+```
+
+Create 3 machines without attaching additional storage to them
+
+```
+# python add_vm_rhev.py --url="RHEV_API_WEB - eg https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --memory=16  --vmtemplate="test-template" --disksize=50 --storagedomain=iSCSI --vmsockets=16 --vmprefix=openshift_master --num=3 --addstorage=no
 ```
 
 #### Example 3 - create amazon like machines - some examples
