@@ -108,7 +108,7 @@ Tag all machines with `openshift_master` prefix
 Create 3 machines without attaching additional storage to them
 
 ```
-# python add_vm_rhev.py --url="RHEV_API_WEB - eg https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --memory=16  --vmtemplate="test-template" --disksize=50 --storagedomain=iSCSI --vmsockets=16 --vmprefix=openshift_master --num=3 --addstorage=no
+# python add_vm_rhev.py --url="RHEV_API_WEB - eg https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --memory=16  --vmtemplate="test-template" --disksize=50 --vmprefix=openshift_master --num=3 --addstorage=no
 ```
 
 #### Example 3 - create amazon like machines - some examples
