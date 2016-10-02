@@ -106,10 +106,16 @@ def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets,addsto
 				print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
 				   " cores:", vmcores,
 				   " sockets", vmsockets,
-				   " storage disk", disksize, "[GB]")
+				   " storage disk", disksize, "[GB]"
+					   )
 			elif addstorage == "no":
 				print ("addstorage=no was specified for", vm_name,"no additional disk will be added, starting VM:", vm_name)
 				api.vms.get(vm_name).start()
+				print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
+					   "cores:", vmcores,
+					   "sockets:", vmsockets,
+					   "storage_disk", disksize, "[GB]"
+					   )
 		except Exception as e:
 			print ("Adding virtual machine '%s' failed: %s", vm_name, e)
 
