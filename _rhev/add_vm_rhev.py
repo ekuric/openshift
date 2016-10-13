@@ -27,8 +27,11 @@ parser.add_argument("--storagedomain", help="which storage domain to use for spa
                                             " If not sure which one - check web interface and/or contact RHEV admin", default="iSCSI")
 
 parser.add_argument("--network", help="Where to connect eth0 network interface"
-									  " network specified here has to be present in RHEV environment prior trying to create virtual machines, default is ovirtmgmt network", default="ovirtmgmt")
+                                      " network specified here has to be present in RHEV environment prior trying to create virtual machines, default is ovirtmgmt network", default="ovirtmgmt")
 parser.add_argument("--addstorage", help="wheather or not to attach additional storage from storage domain to this VM", default="no")
+
+parser.add_argument("--vmdiskpreallocated", help="For new VM use preallocted disk instead of thin, by default RHEV will use thin if preallocated is not specified" , default="no")
+parser.add_argument("--diskpreallocated", help="If there is additional disk added to VM this will define will be disk be preallocated instead of default thin", default="no")
 args = parser.parse_args()
 
 url=args.url
@@ -48,6 +51,9 @@ vmsockets = args.vmsockets
 network = args.network
 addstorage = args.addstorage
 
+vmdiskpreallocated = args.vmdiskpreallocated
+diskpreallocated = args.diskpreallocated
+
 # basic configurations / functions
 
 # api definition
@@ -66,58 +72,93 @@ def wait_disk_state(disk_name, state):
         time.sleep(1)
 
 def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets,addstorage):
-	print ("------------------------------------------------------")
-	print ("Creating", num, "RHEV based virtual machines")
-	print ("-------------------------------------------------------")
-	for machine in range(0,int(num)):
-		try:
-			vm_name = str(vmprefix) + "_" + str(machine) + "_sockets_" + str(vmsockets)
-			vm_memory = int(memory)*1024*1024*1024
-			vm_cluster = api.clusters.get(name=cluster)
-			vm_template = api.templates.get(name=vmtemplate)
-			vm_os = params.OperatingSystem(boot=[params.Boot(dev="hd")])
-			cpu_params = params.CPU(topology=params.CpuTopology(sockets=vmsockets,cores=vmcores))
-			vm_params = params.VM(name=vm_name,memory=vm_memory,cluster=vm_cluster,template=vm_template,os=vm_os,cpu=cpu_params)
-			print ("creating virtual machine", vm_name)
-			api.vms.add(vm=vm_params)
-			api.vms.get(vm_name).nics.add(params.NIC(name=nicname, network=params.Network(name=network), interface='virtio'))
-			print ("Virtual machine created: ", vm_name, "and it has parameters"," memory:", memory,"[GB]",
-				   " cores:", vmcores,
-				   " sockets", vmsockets,
-				   " waiting on machine to unlock so we proceed with configuration")
-			wait_vm_state(vm_name, "down")
-			diskname = "disk_" + str(vmprefix) + str(machine)
+    print ("------------------------------------------------------")
+    print ("Creating", num, "RHEV based virtual machines")
+    print ("-------------------------------------------------------")
+    for machine in range(0,int(num)):
+        try:
+            vm_name = str(vmprefix) + "_" + str(machine) + "_sockets_" + str(vmsockets)
+            vm_memory = int(memory)*1024*1024*1024
+            vm_cluster = api.clusters.get(name=cluster)
+            vm_template = api.templates.get(name=vmtemplate)
+            vm_os = params.OperatingSystem(boot=[params.Boot(dev="hd")])
+            cpu_params = params.CPU(topology=params.CpuTopology(sockets=vmsockets,cores=vmcores))
+            # set proper VM parameters - based on will VM be on "thin" disk or "preallocated" disk
+            if vmdiskpreallocated == "yes":
+                vm_params = params.VM(name=vm_name,memory=vm_memory,cluster=vm_cluster,template=vm_template,os=vm_os,cpu=cpu_params, disks=params.Disks(clone=True))
+            elif vmdiskpreallocated == "no":
+                vm_params = params.VM(name=vm_name,memory=vm_memory,cluster=vm_cluster, template=vm_template, os=vm_os,cpu=cpu_params)
 
-			if addstorage == "yes":
-				api.vms.get(vm_name).disks.add(params.Disk(name=diskname, storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
-														   size=int(disksize)*1024*1024*1024,
-														   status=None,
-														   interface='virtio',
-														   format='cow',
-														   sparse=True,
-														   bootable=False))
-				# if disk is not in "OK" state ... wait here - we cannot start machine if this is not the case
-				print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
-				   " starting machine with disk attached to VM and same time having disk in Locked state will result in machine start failure")
-				wait_disk_state(diskname,"ok")
+            print ("creating virtual machine", vm_name)
+            api.vms.add(vm=vm_params)
+            api.vms.get(vm_name).nics.add(params.NIC(name=nicname, network=params.Network(name=network), interface='virtio'))
+            # update vm and add disk to it
+            wait_vm_state(vm_name,"down")
+            print ("Virtual machine created: ", vm_name, "and it has parameters"," memory:", memory,"[GB]",
+                   " cores:", vmcores,
+                   " sockets", vmsockets,
+                   " waiting on machine to unlock so we proceed with configuration")
+            wait_vm_state(vm_name, "down")
+            diskname = "disk_" + str(vmprefix) + str(machine)
 
-				print ("Machine", vm_name, "is ready to be started")
-				api.vms.get(vm_name).start()
-				print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
-				   " cores:", vmcores,
-				   " sockets", vmsockets,
-				   " storage disk", disksize, "[GB]"
-					   )
-			elif addstorage == "no":
-				print ("addstorage=no was specified for", vm_name,"no additional disk will be added, starting VM:", vm_name)
-				api.vms.get(vm_name).start()
-				print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
-					   "cores:", vmcores,
-					   "sockets:", vmsockets,
-					   "storage_disk", disksize, "[GB]"
-					   )
-		except Exception as e:
-			print ("Adding virtual machine '%s' failed: %s", vm_name, e)
+            # if there is necessary to add additional disk to VM - can be preallocated or thin
+
+            if addstorage == "yes" and diskpreallocated == "no":
+                api.vms.get(vm_name).disks.add(params.Disk(name=diskname, storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
+                                                           size=int(disksize)*1024*1024*1024,
+                                                           status=None,
+                                                           interface='virtio',
+                                                           format='cow',
+                                                           sparse=True,
+                                                           bootable=False))
+
+                print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
+                                                                                      " starting machine with disk attached to VM and same time having disk in Locked state will result in machine start failure")
+                wait_disk_state(diskname,"ok")
+
+                print ("Machine", vm_name, "is ready to be started")
+                api.vms.get(vm_name).start()
+                print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]",
+                       "cores:", vmcores,
+                       " sockets", vmsockets,
+                       " storage disk", disksize, "[GB]")
+
+
+            elif addstorage == "yes" and diskpreallocated == "yes":
+                api.vms.get(vm_name).disks.add(params.Disk(name=diskname, storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
+                                                           size=int(disksize)*1024*1024*1024,
+                                                           status=None,
+                                                           interface='virtio',
+                                                           format='raw',
+                                                           sparse=False,
+                                                           bootable=False
+                                                           ))
+
+                # if disk is not in "OK" state ... wait here - we cannot start machine if this is not the case
+                print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
+                   " starting machine with disk attached to VM and same time having disk in Locked state will result in machine start failure")
+                wait_disk_state(diskname,"ok")
+
+                print ("Machine", vm_name, "is ready to be started")
+                api.vms.get(vm_name).start()
+                print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
+                   " cores:", vmcores,
+                   " sockets", vmsockets,
+                   " storage disk", disksize, "[GB]"
+                       )
+
+            elif addstorage == "no":
+                print ("addstorage=no was specified for", vm_name,"no additional disk will be added, starting VM:", vm_name)
+                api.vms.get(vm_name).start()
+
+            print ("Machine", vm_name, "started successfully, machine parameters are memory:",memory,"[GB]"
+                       "cores:", vmcores,
+                       "sockets:", vmsockets,
+                       "storage_disk", disksize, "[GB]"
+                       )
+        except Exception as e:
+            print ("Adding virtual machine '%s' failed: %s", vm_name, e)
+
 
 
 create_vm(vmprefix, disksize, storagedomain,network, vmcores, vmsockets, addstorage)
