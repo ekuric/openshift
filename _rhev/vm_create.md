@@ -63,6 +63,21 @@ optional arguments:
                           wheather or not to attach additional storage from
                           storage domain to this VM
 
+  --vmdiskpreallocated VMDISKPREALLOCATED
+                          For new VM use preallocted disk instead of thin, by
+                          default RHEV will use thin if preallocated is not
+                          specified
+
+    --diskpreallocated DISKPREALLOCATED
+                          If there is additional disk added to VM this will
+                          define will be disk be preallocated instead of default
+                          thin
+
+
+   --numdisks NUMDISKS   how many disks to attach to particular VM - be
+                         reasonalbe, trying to attach too many disks will not work due to kernel
+                         limits
+
 ```
 
 It is assumed that only one core per socket hardware supports, in all examples below it is

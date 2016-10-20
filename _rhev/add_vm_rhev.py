@@ -32,6 +32,7 @@ parser.add_argument("--addstorage", help="wheather or not to attach additional s
 
 parser.add_argument("--vmdiskpreallocated", help="For new VM use preallocted disk instead of thin, by default RHEV will use thin if preallocated is not specified" , default="no")
 parser.add_argument("--diskpreallocated", help="If there is additional disk added to VM this will define will be disk be preallocated instead of default thin", default="no")
+parser.add_argument("--numdisks", help="how many disks to attach to particular VM - be reasonalbe, trying to attach too many disks will not work due to kernel limits", default=1)
 args = parser.parse_args()
 
 url=args.url
@@ -53,6 +54,7 @@ addstorage = args.addstorage
 
 vmdiskpreallocated = args.vmdiskpreallocated
 diskpreallocated = args.diskpreallocated
+numdisks = args.numdisks
 
 # basic configurations / functions
 
@@ -104,17 +106,19 @@ def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets,addsto
             # if there is necessary to add additional disk to VM - can be preallocated or thin
 
             if addstorage == "yes" and diskpreallocated == "no":
-                api.vms.get(vm_name).disks.add(params.Disk(name=diskname, storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
+
+                for disk in range(0,int(numdisks)):
+                    # add one disk at time - one will be added by default - only add thin disks
+                    api.vms.get(vm_name).disks.add(params.Disk(name=diskname + "_" + str(disk), storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
                                                            size=int(disksize)*1024*1024*1024,
                                                            status=None,
                                                            interface='virtio',
                                                            format='cow',
                                                            sparse=True,
                                                            bootable=False))
-
-                print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
+                    print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
                                                                                       " starting machine with disk attached to VM and same time having disk in Locked state will result in machine start failure")
-                wait_disk_state(diskname,"ok")
+                    wait_disk_state(diskname + "_" + str(disk) ,"ok")
 
                 print ("Machine", vm_name, "is ready to be started")
                 api.vms.get(vm_name).start()
@@ -125,7 +129,9 @@ def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets,addsto
 
 
             elif addstorage == "yes" and diskpreallocated == "yes":
-                api.vms.get(vm_name).disks.add(params.Disk(name=diskname, storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
+
+                for disk in range(0, int(numdisks)):
+                    api.vms.get(vm_name).disks.add(params.Disk(name=diskname + "_" + str(disk) , storage_domains=params.StorageDomains(storage_domain=[api.storagedomains.get(name=storagedomain)]),
                                                            size=int(disksize)*1024*1024*1024,
                                                            status=None,
                                                            interface='virtio',
@@ -133,11 +139,10 @@ def create_vm(vmprefix,disksize, storagedomain,network, vmcores,vmsockets,addsto
                                                            sparse=False,
                                                            bootable=False
                                                            ))
-
-                # if disk is not in "OK" state ... wait here - we cannot start machine if this is not the case
-                print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
+                    # if disk is not in "OK" state ... wait here - we cannot start machine if this is not the case
+                    print ("Disk of size:",disksize,"GB originating from", storagedomain, "storage domain is attached to VM - but we cannot start machine before disk is in OK state"
                    " starting machine with disk attached to VM and same time having disk in Locked state will result in machine start failure")
-                wait_disk_state(diskname,"ok")
+                    wait_disk_state(diskname + "_" + str(disk) ,"ok")
 
                 print ("Machine", vm_name, "is ready to be started")
                 api.vms.get(vm_name).start()
