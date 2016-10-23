@@ -1,29 +1,60 @@
 ### Add RHEV based VM
 
 #### Prerequisites for usage
-- Client from where scripts are supposed must be able to access RHEV api interface
-- On Fedora it is necessary to install `ovirt-engine-sdk-python` python library
+
+- The client from where scripts are supposed to be run, must be able to access RHEV api interface
+- On Fedora it is necessary to install `ovirt-engine-sdk-python` python library. This can achieved with below command
+
 
 ```
 # dnf install ovirt-engine-sdk-python
 ```
 
 - If not executed directly from RHEV manager, ensure to pass correct location for `--rhevcafile` (How to get rhevcafile check with RHEV system administrator)
-By default `--rhevcafile` will try to access and read `/etc/pki/ovirt-engine/ca.pem` which is at that location on RHEV manager, for other cases
+By default `--rhevcafile` will be searched and tried to access at `/etc/pki/ovirt-engine/ca.pem` which is at that location on RHEV manager, for other cases
 it is necessary to have access to RHEV `ca.pem` certificate
+
+#### Properties
+
+Using `add_vm_rhev.py` it is possible to create desired number of virtual machines from particular template.VM disk can be `thin` - what is default in RHEV, or `preallocated` if `vmdiskpreallocated=yes` is specified when script
+is executed.
+For most cases using `thin` volume disk type for virtual macihine VM is satisfactory, however for cases where is necessary to
+have virtual machines with minimum possible latency ( ideal candidates for this  are OpenShift masters and/or ETCD servers), then
+it is  strogly advisable to have virtual machines with `preallocated` storage
+
+For more information regarding RHEV virtual disk, refer to RHEV documentation chapter [Understanding Virtual Disks](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Administration_Guide/Understanding_virtual_disks.html)
+
+
+If there is necessary to have virtual machine with multiple (additional) disks attached to it, then specifying
+`--numdisks` with number of additional disks will do that. It is necessary to mention that specifying high number
+for `numdisks` will eventually fail due to kernel limitation. Reasonable number for `numdisks` for most cases is
+up to 40, what is going to attach 40 disk devices to virtual machine. This is limitation from RHEV virtual machine side, other limitation could appear
+if size of allocated disks cannot be accomodated at storage side.
+
+For case when is chosen to create `preallocated` storage type and/or many disk to be attached to
+virtual machine with `numdisks` the time it takes to create virtual machine(s) can be long and it is
+recommended to use these two options only when really necessary.
+
+For more details, check `USAGE` section
+
+
 
 #### USAGE
 
 For details how to use [add_vm_rhev.py](https://github.com/ekuric/openshift/blob/master/_rhev/add_vm_rhev.py) script refer to below help output
 ```
-# python add_vm_rhev.py  -h
+# python add_vm_rhev.py -h
 usage: add_vm_rhev.py [-h] --url URL --rhevusername RHEVUSERNAME
                       --rhevpassword RHEVPASSWORD [--rhevcafile RHEVCAFILE]
                       [--memory MEMORY] [--cluster CLUSTER]
                       [--vmtemplate VMTEMPLATE] [--nicname NICNAME]
                       [--num NUM] --vmprefix VMPREFIX [--disksize DISKSIZE]
                       [--vmcores VMCORES] [--vmsockets VMSOCKETS]
-                      --storagedomain STORAGEDOMAIN
+                      [--storagedomain STORAGEDOMAIN] [--network NETWORK]
+                      [--addstorage ADDSTORAGE]
+                      [--vmdiskpreallocated VMDISKPREALLOCATED]
+                      [--diskpreallocated DISKPREALLOCATED]
+                      [--numdisks NUMDISKS]
 
 Script to create RHEV based virtual machines
 
@@ -54,29 +85,24 @@ optional arguments:
                         which storage domain to use for space when allocating
                         storage for VM If not sure which one - check web
                         interface and/or contact RHEV admin
-
   --network NETWORK     Where to connect eth0 network interface network
-                          specified here has to be present in RHEV environment
-                          prior trying to create virtual machines, default is
-                          ovirtmgmt network
+                        specified here has to be present in RHEV environment
+                        prior trying to create virtual machines, default is
+                        ovirtmgmt network
   --addstorage ADDSTORAGE
-                          wheather or not to attach additional storage from
-                          storage domain to this VM
-
+                        wheather or not to attach additional storage from
+                        storage domain to this VM
   --vmdiskpreallocated VMDISKPREALLOCATED
-                          For new VM use preallocted disk instead of thin, by
-                          default RHEV will use thin if preallocated is not
-                          specified
-
-    --diskpreallocated DISKPREALLOCATED
-                          If there is additional disk added to VM this will
-                          define will be disk be preallocated instead of default
-                          thin
-
-
-   --numdisks NUMDISKS   how many disks to attach to particular VM - be
-                         reasonalbe, trying to attach too many disks will not work due to kernel
-                         limits
+                        For new VM use preallocted disk instead of thin, by
+                        default RHEV will use thin if preallocated is not
+                        specified
+  --diskpreallocated DISKPREALLOCATED
+                        If there is additional disk added to VM this will
+                        define will be disk be preallocated instead of default
+                        thin
+  --numdisks NUMDISKS   how many disks to attach to particular VM - be
+                        reasonalbe, trying to attach too many disks will not
+                        work due to kernel limits
 
 ```
 
@@ -90,7 +116,7 @@ if it necessary (and if hardware supports that) it is possible to add more cores
 
 #### Example 1:
 
-Create 10 machines with 8 GB of memory, 4  sockets and 1 core per sockets. Attach 10 GB disk to every machine
+Create 10 machines with 8 GB of memory, 4  sockets and 1 core per sockets. Attach additional 10 GB disk to every created VM machine
 ```
 # python add_vm_rhev.py --url="RHEV_API_WEB - eg https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --memory=8  --vmtemplate="test-template" --disksize=10 --storagedomain=iSCSI --vmsockets=4 --vmprefix=openshift_master --num=10
 ```
@@ -112,13 +138,17 @@ It is strongly advised to use proper value for `vmprefix` parameter
 
 #### Example 2:
 
-Create 3 machines with 16 GB of memory, 16 CPU sockets and 1 core per sockets. Attach 50 GB disk to newly created machines.
+Create 3 machines with 16 GB of memory, 16 CPU sockets and 1 core per sockets. Attach 50 GB disk to newly created machines. Put virtual machines
+disk on `preallocated` disk type
 
 Tag all machines with `openshift_master` prefix
 
 ```
-# python add_vm_rhev.py --url="RHEV_API_WEB - eg https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="mypasswd" --memory=16  --vmtemplate="test-template" --disksize=50 --storagedomain=iSCSI --vmsockets=16 --vmprefix=openshift_master --num=3
+# python add_vm_rhev.py --url="RHEV_API_WEB - eg https://rhv-m.local/ovirt-engine/api" --vmdiskpreallocated=yes --rhevusername="admin@internal" --rhevpassword="mypasswd" --memory=16  --vmtemplate="test-template" --disksize=50 --storagedomain=iSCSI --vmsockets=16 --vmprefix=openshift_master --num=3
 ```
+Creating virtual machines with `preallocated` disk can lead to longer VM creation time. In nutshell RHEV will do `dd` to disk which will be
+used by virtual machine. The bigger disk specified in VM template, the longer creation time with `preallocated` disk will last
+
 
 Create 3 machines without attaching additional storage to them
 
@@ -213,8 +243,8 @@ Start all virtual machines which name start with prefix `openshift_master`
 #### Example 3
 
 Delete all virtual machines which name start with `openshift_master` from RHEV cluster.
-This step is destructive, so be careful and pass correct `vmprefix` value. Machines which run will not be deleted, they first need
-to be stopped
+This step is destructive, so be careful and pass correct `vmprefix` value. Machines which run will not be deleted, they first need to be stopped, already stopped machines
+will be removed from RHEV cluster and cannot be recovered
 ```
 # delete_rhev_vm.py --url="<rhev url api eg. https://rhv-m.local/ovirt-engine/api" --rhevusername="admin@internal" --rhevpassword="secret_pass" --vmprefix=openshift_master --action delete
 ```
