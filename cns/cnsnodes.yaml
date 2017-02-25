@@ -1,0 +1,37 @@
+---
+clusters:
+- nodes:
+  - node:
+      hostnames:
+        manage:
+        - (fqnd) - as showed in "oc get nodes"
+        storage:
+        - 192.168.10.100
+      zone: 1
+    devices:
+    - "/dev/sdx"
+    - "/dev/sdy"
+  - node:
+      hostnames:
+        manage:
+        - (fqdn) - as showed in "oc get nodes"
+        storage:
+        - 192.168.10.102
+      zone: 2
+    devices:
+    - "/dev/sdx"
+    - "/dev/sdy"
+
+  - node:
+      hostnames:
+        manage:
+          - (fqdn) - as showed in "oc get nodes"
+        storage:
+          - 123.1.1.1
+      zone: 1
+    devices:
+      - "/dev/fff"
+      - "/dev/fff"
+
+
+
