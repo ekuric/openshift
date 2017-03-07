@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # python script to query heketi API - specifically /volumes and print number of volumes over time
+#
 
 import argparse
 import urllib2
@@ -15,6 +16,7 @@ parser.add_argument("--port", help="Heketi service port",default=8080, required=
 parser.add_argument("--volfile", help="Output file where to write changes in number of heketi volumes",required=True, default="heketivol.txt")
 parser.add_argument("--numvol", help="How many heketi volumes is expected to be created")
 parser.add_argument("--action", help="either : create , or delete", required=True)
+parser.add_argument("--timeout", help="timeout how often to query heketi /volumes endpoint, default is 1s", default=1)
 
 args = parser.parse_args()
 
@@ -24,6 +26,7 @@ projectname = args.projectname
 volfile = args.volfile
 numvol = args.numvol
 action = args.action
+timeout = args.timeout
 
 
 def delete_cns():
@@ -44,7 +47,7 @@ def delete_cns():
             cnsvolumes = volumes.values()
             currentvol.write("Number of running CNS volumes: %s\r\n" % str(len(cnsvolumes[0])))
 
-        time.sleep(1)
+        time.sleep(timeout)
 
     te = time.time()
     with open(volfile, "a+")  as currentvol:
@@ -65,7 +68,7 @@ def create_cns():
             cnsvolumes = volumes.values()
             startvol.write("Number of running CNS volumes: %s\r\n" % str(len(cnsvolumes[0])))
 
-        time.sleep (1)
+        time.sleep (timeout)
 
 
     te = time.time()
