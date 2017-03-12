@@ -34,15 +34,16 @@ def delete_cns():
     cnsvolumes = volumes.values()
     startvol = len(cnsvolumes[0])-1
     subprocess.call(["oc", "delete", "pvc", "--all", "-n", projectname])
+    print ("Deleting CNS volumes, necessary to delete", int(startvol), "volumes - waiting now...")
 
     ts = time.time()
 
     while int(len(cnsvolumes[0])) > int(startvol):
+        with open(volfile, "a+") as currentvol:
+            currentvol.write("CNS volumes delete not started - CNS volumes present: %s\r\n" % str(len(cnsvolumes[0])))
         response = urllib2.urlopen(urllocation)
         volumes = json.load(response)
         cnsvolumes = volumes.values()
-        with open(volfile, "a+") as currentvol:
-            currentvol.write("CNS volumes delete not started - CNS volumes present: %s\r\n" % str(len(cnsvolumes[0])))
         time.sleep(1)
 
     sd = time.time()
@@ -59,7 +60,7 @@ def delete_cns():
 
     with open(volfile, "a+")  as currentvol:
         currentvol.write("Total deleted CNS volumes: %s\r\nTotal delete time: %s\r\nWait time before delete started: %s\r\n" % (str(startvol), str(te-ts), str(sd-ts)))
-
+    print ("Total CNS volumes deleted", int(startvol), "delete time", float(te-ts), "seconds")
 
 def create_cns():
 
