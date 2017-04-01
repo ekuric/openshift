@@ -4,7 +4,7 @@
 
 # defautls
 NOK=1
-# make dirs inside pod for mariadb
+# make dirs inside pod for mariadb - updated
 DB_DIR="/root/"
 THREADS="1,6,12,24,48"
 MARIADBCONF="/etc/my.cnf"
