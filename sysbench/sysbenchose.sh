@@ -99,7 +99,7 @@ prepare_db() {
     sleep 25
     mysqladmin -f -uroot -p100yard- drop sbtest
     mysqladmin -uroot -p100yard- create sbtest
-    sysbench --test=/root/perf-dept/bench/sysbench/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-table-size=$oltp --mysql-db=sbtest --mysql-user=root --mysql-password=100yard- prepare
+    sysbench --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-table-size=$oltp --mysql-db=sbtest --mysql-user=root --mysql-password=100yard- prepare
 }
 
 start_test() {
@@ -107,7 +107,7 @@ start_test() {
     for numthread in $(echo $THREADS | sed -e s/,/" "/g); do
         mkdir -p $resultdir/$(hostname -s)/threads_$numthread
         printf "Running test with $numthread sysbench threads\n"
-        sysbench run --test=/root/perf-dept/bench/sysbench/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads=$numthread --mysql-table-engine=innodb --mysql-user=root --mysql-password=100yard- --oltp-table-size=$oltp --max-time=1800 --max-requests=100000 > $resultdir/$(hostname -s)/threads_$numthread/test_$DATE.log
+        sysbench run --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads=$numthread --mysql-table-engine=innodb --mysql-user=root --mysql-password=100yard- --oltp-table-size=$oltp --max-time=1800 --max-requests=100000 > $resultdir/$(hostname -s)/threads_$numthread/test_$DATE.log
         printf "Successfully finished sysbench test for $numthread sysbench threads\n"
     done
 }
