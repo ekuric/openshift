@@ -1,7 +1,8 @@
 # Latest centos6 images 
 FROM centos:6
 
-RUN yum -y install git wget tar which
+RUN yum -y install git wget tar which automake libtool mariadb mariadb-bench mariadb-server mariadb-test gcc gcc-c++ autoconf make zlib zlib-devel openssl-devel gettext \
+                                                         openssh-server MariaDB-devel && yum clean all
 
 # clone sysbenchose.sh script 
 RUN curl -o /root/sysbenchose.sh https://gist.githubusercontent.com/ekuric/0df39b0fce5da36cf00f1b77dff95dc3/raw/e1c9bc2f3b69b274311c99b6410872d92686963e/sysbenchose.sh
@@ -14,11 +15,7 @@ baseurl         =  http://yum.mariadb.org/10.0/centos6-amd64/ \n\
 enabled         = 1 \n\
 gpgcheck        = 0' > /etc/yum.repos.d/mariadb.repo
 
-RUN yum install -y automake libtool mariadb mariadb-bench mariadb-server mariadb-test gcc gcc-c++ autoconf make zlib zlib-devel openssl-devel gettext \
-                   openssh-server MariaDB-devel && yum clean all
-
-
-# get and compile sysbench 
+# get and compile sysbench
 RUN wget http://repo.percona.com/apt/pool/main/s/sysbench/sysbench_0.5.orig.tar.gz
 RUN tar -xaf sysbench_0.5.orig.tar.gz  && cd sysbench-0.5 && sed '/AC_LIB_PREFIX\(\)/d' -i configure.ac && ./autogen.sh && ./configure && make && make install
 
