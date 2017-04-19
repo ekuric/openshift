@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
 # script to run sysbench test inside pod - assumes sysbench and mariadb installed
+# sysbench test run is oltp.lua - more information about
+# oltp.lua find at : https://www.percona.com/docs/wiki/benchmark_sysbench_oltp.html
+
 
 # defautls
 NOK=1
-# make dirs inside pod for mariadb - updated
+# make dirs inside pod for mariadb
 DB_DIR="/root/"
 THREADS="1,6,12,24,48"
 MARIADBCONF="/etc/my.cnf"
+DATE=`date +%Y-%m-%d-%H-%M-%S`
 
 ##
 usage() {
@@ -24,7 +28,7 @@ if [ "$EUID" -ne 0 ] || [ "$#" -eq 0 ] ; then
     exit $NOK
 fi
 
-opts=$(getopt -q -o d:t:h --longoptions "directory:,threads:,help" -n "getopt.sh" -- "$@");
+opts=$(getopt -q -o d:t:h:o:r: --longoptions "directory:,threads:,oltp:,resultdir:,help" -n "getopt.sh" -- "$@");
 eval set -- "$opts";
 echo "processing options"
 while true; do
@@ -40,6 +44,20 @@ while true; do
             shift;
             if [ -n "$1" ]; then
                 THREADS="$1"
+                shift;
+            fi
+        ;;
+        -o|--oltp)
+            shift;
+            if [ -n "$1" ]; then
+                oltp="$1"
+                shift;
+            fi
+        ;;
+        -r|--resultdir)
+            shift;
+            if [ -n "$1" ]; then
+                resultdir="$1"
                 shift;
             fi
         ;;
@@ -65,18 +83,13 @@ startdb() {
     mkdir -p $DB_DIR/datalog
     pkill mysqld_safe
     sed -i 's/pid\-file\=\/var\/run\/mariadb\/mariadb\.pid/pid\-file\=\/root\/mariadb\.pid/g' $MARIADBCONF
+    echo "starting myslq..."
     mysqld_safe --user=root --basedir=/usr --skip-grant-tables --innodb_data_home_dir=$DB_DIR/data \
             --innodb_buffer_pool_size=2048M --innodb_log_group_home_dir=$DB_DIR/datalog --innodb_log_buffer_size=64M \
             --innodb_additional_mem_pool_size=32M --innodb_flush_log_at_trx_commit=0 --innodb_log_file_size=1G \
             --innodb_thread_concurrency=1000 --max_connections=1000 --table_cache=4096 --innodb_flush_method=O_DIRECT &
+    sleep 60
 }
-
-configure_sysbench() {
-    cd /root/perf-dept/bench/sysbench
-    unzip 0.5.zip && cd sysbench-0.5  && ./autogen.sh && ./configure && make && make install
-    printf "sysbench 0.5 is installed and in place ...ready to run test  \n"
-}
-
 
 prepare_db() {
     printf "Prepare sysbench environment and set up mariadb user\n"
@@ -84,26 +97,23 @@ prepare_db() {
         sleep 5
     fi
     sleep 25
-    mysqladmin -f -uroot -pdbpassword drop sbtest
-    mysqladmin -uroot -pdbpassword create sbtest
-    sysbench --test=/root/perf-dept/bench/sysbench/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-table-size=50000000 --mysql-db=sbtest --mysql-user=root --mysql-password=dbpassword prepare
+    mysqladmin -f -uroot -p100yard- drop sbtest
+    mysqladmin -uroot -p100yard- create sbtest
+    sysbench --test=/root/perf-dept/bench/sysbench/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-table-size=$oltp --mysql-db=sbtest --mysql-user=root --mysql-password=100yard- prepare
 }
 
 start_test() {
-    printf "Runnint test for threads $THREADS  - if not specified with -t - this is default\n"
-    mkdir -p /var/lib/pbench-agent/$(hostname -s)
+    printf "Runnint test for threads: $THREADS\n"
     for numthread in $(echo $THREADS | sed -e s/,/" "/g); do
+        mkdir -p $resultdir/$(hostname -s)/threads_$numthread
         printf "Running test with $numthread sysbench threads\n"
-        sysbench run --test=/root/perf-dept/bench/sysbench/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads=$numthread --mysql-table-engine=innodb \
-        --mysql-user=root --mysql-password=dbpassword --oltp-table-size=10000000 --max-time=1800 --max-requests=10000000 > /var/lib/pbench-agent/$(hostname -s)/test_4GBP_thread_$numthread.log
+        sysbench run --test=/root/perf-dept/bench/sysbench/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads=$numthread --mysql-table-engine=innodb --mysql-user=root --mysql-password=100yard- --oltp-table-size=$oltp --max-time=1800 --max-requests=100000 > $resultdir/$(hostname -s)/threads_$numthread/test_$DATE.log
         printf "Successfully finished sysbench test for $numthread sysbench threads\n"
     done
 }
 
 # main  - prepare and execute all
-
 startdb
-# configure_sysbench - disabled at time, configured during docker image build
 prepare_db
 start_test
 
