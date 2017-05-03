@@ -9,7 +9,7 @@
 NOK=1
 # make dirs inside pod for mariadb
 DB_DIR="/root/"
-THREADS="1,6,12,24,48"
+THREADS="1"
 MARIADBCONF="/etc/my.cnf"
 DATE=`date +%Y-%m-%d-%H-%M-%S`
 
@@ -88,7 +88,7 @@ startdb() {
             --innodb_buffer_pool_size=2048M --innodb_log_group_home_dir=$DB_DIR/datalog --innodb_log_buffer_size=64M \
             --innodb_additional_mem_pool_size=32M --innodb_flush_log_at_trx_commit=0 --innodb_log_file_size=1G \
             --innodb_thread_concurrency=1000 --max_connections=1000 --table_cache=4096 --innodb_flush_method=O_DIRECT &
-    sleep 60
+    sleep 120
 }
 
 prepare_db() {
