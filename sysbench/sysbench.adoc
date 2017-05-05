@@ -18,6 +18,7 @@ To build images run below commands
 # docker run -t sysbenchcentos7 - < centos7
 # docker run -t sysbenchcentos6 - < centos6
 ```
+
 Ensure that these images are present on all nodes where sysbench pods are supposed to run. This can be achieved either by building them on
 nodes directly, or building and pushing to registry which is used by OCP nodes and thus enable them to consume image from there
 
