@@ -8,8 +8,11 @@ projects:
         parameters:
           - STORAGE_CLASS: "storageclass" # this is name of storage class to use
           - STORAGE_SIZE: "3Gi" # this is size of PVC mounted inside pod
-          - MOUNT_PATH: "/mnt/pvcmount"
+          - MOUNT_PATH: "/var/sysbenchresults/"
           - DOCKER_IMAGE: "dockerimage"
+          - THREADS: "1,2,4,8,16,24,48"
+          - OLTP: "100000"
+          - SYSBENCH_RESULTS: "/var/sysbench_results"
 
 tuningsets:
   - name: default

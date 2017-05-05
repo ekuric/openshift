@@ -156,13 +156,13 @@
           "name": "MOUNT_PATH",
           "description": "The location where inside pod PVC will be mounted",
           "required": true,
-          "value":"/mnt/pvcmount"
+          "value":"/mnt/sysbench"
         },
       {
         "name": "SYSBENCH_RESULTS",
         "description": "The location where sysbench will write its output",
         "required": true,
-        "value": "/mnt"
+        "value": "/mnt/sysbench_results"
       }
     ]
 }

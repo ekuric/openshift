@@ -4,8 +4,8 @@ FROM centos:6
 RUN yum -y install git wget tar which automake libtool mariadb mariadb-bench mariadb-server mariadb-test gcc gcc-c++ autoconf make zlib zlib-devel openssl-devel gettext \
                                                          openssh-server MariaDB-devel && yum clean all
 
-# clone sysbenchose.sh script 
-RUN curl -o /root/sysbenchose.sh https://gist.githubusercontent.com/ekuric/0df39b0fce5da36cf00f1b77dff95dc3/raw/e1c9bc2f3b69b274311c99b6410872d92686963e/sysbenchose.sh
+# clone sysbenchose.sh script
+RUN curl -o /root/sysbenchose.sh https://raw.githubusercontent.com/ekuric/openshift/master/sysbench/sysbenchose.sh
 RUN chmod +x /root/sysbenchose.sh
 
 # get mariadb packages 
@@ -26,8 +26,6 @@ ENV HOME /root
 ENV USER root
 ENV LANG en_US.UTF-8
 WORKDIR /root
-
-# Setup passwordless ssh key authentication
 
 # Setup root password in the container
 RUN echo "root:redhat" | chpasswd

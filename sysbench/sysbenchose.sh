@@ -96,7 +96,8 @@ prepare_db() {
     if [ ! -e /root/mariadb.pid ]; then
         sleep 5
     fi
-    sleep 25
+    # todo: make mariadb more resilient
+    sleep 120
     mysqladmin -f -uroot -p100yard- drop sbtest
     mysqladmin -uroot -p100yard- create sbtest
     sysbench --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-table-size=$oltp --mysql-db=sbtest --mysql-user=root --mysql-password=100yard- prepare

@@ -2,11 +2,10 @@
 FROM centos:7
 RUN yum -y install git wget tar which automake libtool mariadb mariadb-bench mariadb-server mariadb-test gcc gcc-c++ autoconf make zlib zlib-devel openssl-devel gettext openssh-server mariadb-devel && yum clean all
 
-
-RUN curl -o /root/sysbenchose.sh https://gist.githubusercontent.com/ekuric/3789450946157440ccb4ee01ea9bb53a/raw/d5e482cf5f7c88c7e802856ee4a1cef224fdba34/sysbenchose.sh
+RUN curl -o /root/sysbenchose.sh https://raw.githubusercontent.com/ekuric/openshift/master/sysbench/sysbenchose.sh
 RUN chmod +x /root/sysbenchose.sh
 
-# get sysbench  
+# get sysbench and compile it
 RUN wget http://repo.percona.com/apt/pool/main/s/sysbench/sysbench_0.5.orig.tar.gz
 RUN tar -xaf sysbench_0.5.orig.tar.gz  && cd sysbench-0.5 && sed '/AC_LIB_PREFIX\(\)/d' -i configure.ac && ./autogen.sh && ./configure && make && make install 
 
