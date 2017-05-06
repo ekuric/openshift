@@ -44,7 +44,7 @@ install_software() {
         start_docker
 
     else
-        echo "we cannot determine platform used here, ... check it again"
+        echo "Cannot determine rpm based platform here, ... check it again"
         exit 1
     fi
 }
