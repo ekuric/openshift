@@ -18,6 +18,8 @@ usage() {
         printf  "Usage: ./$(basename $0) -d directory -t threads\n"
         printf -- "-d directory: directory which will be used by mariadb for read/write operations - this has to be provided otherwise /root/data and /root/datalog will be used\n"
         printf -- "-t threads : comma seperated list of values for number of threads, if none added, then default THREADS=1,6,12,24,48 is used\n"
+        printf -- "-o oltp: number of rows in test table\n"
+        printf -- "-r resultdir - the location where sybench results will be saved - this has to be mounted with -v (volume) option inside container"
         exit 0
 }
 
@@ -85,9 +87,9 @@ startdb() {
     sed -i 's/pid\-file\=\/var\/run\/mariadb\/mariadb\.pid/pid\-file\=\/root\/mariadb\.pid/g' $MARIADBCONF
     echo "starting myslq..."
     mysqld_safe --user=root --basedir=/usr --skip-grant-tables --innodb_data_home_dir=$DB_DIR/data \
-            --innodb_buffer_pool_size=2048M --innodb_log_group_home_dir=$DB_DIR/datalog --innodb_log_buffer_size=64M \
-            --innodb_additional_mem_pool_size=32M --innodb_flush_log_at_trx_commit=0 --innodb_log_file_size=1G \
-            --innodb_thread_concurrency=1000 --max_connections=1000 --table_cache=4096 --innodb_flush_method=O_DIRECT &
+            --innodb_log_group_home_dir=$DB_DIR/datalog --innodb_log_buffer_size=64M \
+            --innodb_log_file_size=1048576 --innodb_thread_concurrency=0 --max_connections=1000 --table_cache=4096 --innodb_flush_method=O_DIRECT &
+
     sleep 120
 }
 
@@ -98,9 +100,9 @@ prepare_db() {
     fi
     # todo: make mariadb more resilient
     sleep 120
-    mysqladmin -f -uroot -p100yard- drop sbtest
-    mysqladmin -uroot -p100yard- create sbtest
-    sysbench --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-table-size=$oltp --mysql-db=sbtest --mysql-user=root --mysql-password=100yard- prepare
+    mysqladm -f -uroot -pmysqlpass drop sbtest
+    mysqladmin -uroot -pmysqlpass create sbtest
+    sysbench --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --oltp-table-size=$oltp --mysql-db=sbtest --mysql-user=root --mysql-password=mysqlpass prepare
 }
 
 start_test() {
@@ -108,7 +110,7 @@ start_test() {
     for numthread in $(echo $THREADS | sed -e s/,/" "/g); do
         mkdir -p $resultdir/$(hostname -s)/threads_$numthread
         printf "Running test with $numthread sysbench threads\n"
-        sysbench run --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads=$numthread --mysql-table-engine=innodb --mysql-user=root --mysql-password=100yard- --oltp-table-size=$oltp --max-time=1800 --max-requests=100000 > $resultdir/$(hostname -s)/threads_$numthread/test_$DATE.log
+        sysbench run --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads=$numthread --mysql-table-engine=innodb --mysql-user=root --mysql-password=mysqlpass --oltp-table-size=$oltp --max-time=1800 --max-requests=100000 > $resultdir/$(hostname -s)/threads_$numthread/test_$DATE.log
         printf "Successfully finished sysbench test for $numthread sysbench threads\n"
     done
 }
