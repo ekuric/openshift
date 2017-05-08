@@ -73,6 +73,37 @@ tuningsets:
 
 ```
 
+==== Running Sysbench Test in Pbench Mode
+
+https://github.com/distributed-system-analysis/pbench[Pbench tool] offers option to collect system data
+during test execution. With system data we mean different system / performance data collected with
+general tools like `sar`, `iostat`, `mpstat` and many others. For detailed list, refer to pbench https://github.com/distributed-system-analysis/pbench/tree/master/agent/tool-scripts[tool scripts]
+
+Pbench has `pbench-user-benchmark` https://github.com/distributed-system-analysis/pbench/blob/master/agent/bench-scripts/pbench-user-benchmark[script]
+It is possible to use `pbench-user-benchmark` script to run sysbench test and at same time to collect system data
+during test execution.
+
+`pbench-user-benchmark` exports https://github.com/distributed-system-analysis/pbench/blob/master/agent/bench-scripts/pbench-user-benchmark#L107[benchmark_run_dir]
+variable and it can be used as value for `SYSBENCH_RESULTS` to ensure that sysbench data are
+collected to pbench directory too.
+Simple script would be
+
+```
+# pbench-user-benchmark --config="sysbench_test" -- ./runsys.sh
+```
+
+with `runsys.sh` as showed below
+
+
+```
+#!/bin/bash
+python cluster-loader.py -f sysbench-parameters.yaml
+```
+Variable `SYSBENCH_RESULTS` for this test case would be
+```
+SYSBENCH_RESULTS: "$benchmark_run_dir"
+```
+
 ==== Sysbench-parameters.yaml explanation
 
 From above *sysbench-parameters.yaml* we want to do
