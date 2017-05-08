@@ -88,7 +88,7 @@ startdb() {
     echo "starting myslq..."
     mysqld_safe --user=root --basedir=/usr --skip-grant-tables --innodb_data_home_dir=$DB_DIR/data \
             --innodb_log_group_home_dir=$DB_DIR/datalog --innodb_log_buffer_size=64M \
-            --innodb_log_file_size=1048576 --innodb_thread_concurrency=0 --max_connections=1000 --table_cache=4096 --innodb_flush_method=O_DIRECT &
+            --innodb_thread_concurrency=0 --max_connections=1000 --table_cache=4096 --innodb_flush_method=O_DIRECT &
 
     sleep 120
 }
