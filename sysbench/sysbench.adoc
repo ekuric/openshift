@@ -90,7 +90,7 @@ collected to pbench directory too.
 The way we then start test would be
 
 ```
-# pbench-user-benchmark --config="sysbench_test" -- ./runsys.sh
+# pbench-user-benchmark --config="sysbench_test" -- ./runsys.sh <projectName>.0
 ```
 
 with `runsys.sh` as in this https://raw.githubusercontent.com/ekuric/openshift/master/sysbench/runsys.sh[example]
