@@ -86,22 +86,18 @@ during test execution.
 `pbench-user-benchmark` exports https://github.com/distributed-system-analysis/pbench/blob/master/agent/bench-scripts/pbench-user-benchmark#L107[benchmark_run_dir]
 variable and it can be used as value for `SYSBENCH_RESULTS` to ensure that sysbench data are
 collected to pbench directory too.
-Simple script would be
+
+The way we then start test would be
 
 ```
 # pbench-user-benchmark --config="sysbench_test" -- ./runsys.sh
 ```
 
-with `runsys.sh` as showed below
+with `runsys.sh` as in this https://raw.githubusercontent.com/ekuric/openshift/master/sysbench/runsys.sh[example]
 
-
-```
-#!/bin/bash
-python cluster-loader.py -f sysbench-parameters.yaml
-```
 Variable `SYSBENCH_RESULTS` for this test case would be
 ```
-SYSBENCH_RESULTS: "$benchmark_run_dir"
+SYSBENCH_RESULTS: "$benchmark_run_dir/tools-default/sysbench_results"
 ```
 
 ==== Sysbench-parameters.yaml explanation
