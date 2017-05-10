@@ -1,0 +1,107 @@
+{
+    "apiVersion": "v1",
+    "kind": "Template",
+    "metadata": {
+        "name": "sysbench-cpu-test",
+        "labels": {
+            "name": "sysbench-cpu-test"
+        },
+        "annotations": {
+            "descriptions": "sysbench cpu test running inside pods",
+            "tags": "sysbench"
+        }
+    },
+    "objects": [
+        {
+            "kind": "Pod",
+            "apiVersion": "v1",
+            "metadata": {
+                "generateName": "sysbench-pod-",
+                "labels": {
+                    "name": "sysbench-pod-${IDENTIFIER}"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "${DOCKER_IMAGE}",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "sysbench-pod",
+                        "ports": [
+                            {
+                                "containerPort": 22,
+                                "protocol": "TCP",
+                                "targetPort": 22
+                            }
+                        ],
+                        "resources": {},
+                        "volumeMounts": [
+                            {
+                                "name": "sysbench",
+                                "mountPath": "${SYSBENCH_RESULTS}"
+                            }
+                        ],
+                        "command": [ "/bin/bash", "/root/sysbenchose.sh","-t", "${THREADS}","-r", "${SYSBENCH_RESULTS}", "--cpuprime", "${CPU_PRIME}", "--maxreq", "${MAX_REQ}" ],
+                        "securityContext": {
+                            "capabilities": {},
+                            "privileged": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log"
+                    }
+                ],
+                "restartPolicy": "Never",
+                "volumes":[
+                    {
+                        "name": "sysbench",
+                        "hostPath": {
+                        "path": "${SYSBENCH_RESULTS}"
+                    }
+                  }
+                ]
+            }
+        }
+    ],
+    "parameters": [
+      {
+        "name": "THREADS",
+        "description": "how many threads will sysbench run",
+        "required": true,
+        "value": "1"
+      },
+        {
+            "name": "DOCKER_IMAGE",
+            "description": "Which docker image to use to build pods",
+            "required": true,
+            "value": "dockerimage"
+        },
+        {
+            "name": "SYSBENCH_SERVICE_NAME",
+            "description": "SYSBENCH service name",
+            "required": true,
+            "value": "sysbench"
+        },
+        {
+            "name": "IDENTIFIER",
+            "description": "Number to append to the name of resources",
+            "value": "1"
+        },
+      {
+        "name": "SYSBENCH_RESULTS",
+        "description": "The location where sysbench will write its output",
+        "required": true,
+        "value": "/mnt/sysbench_results"
+      },
+      {
+        "name": "CPU_PRIME",
+        "description": "For sysbench CPU test this is CPU prime number value",
+        "required": true,
+        "value": "30000"
+      },
+      {
+        "name": "MAX_REQ",
+        "description": "Limit for total number of OLTP test requests",
+        "required": true,
+        "value": "10000"
+      }
+    ]
+}

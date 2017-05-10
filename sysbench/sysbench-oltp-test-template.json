@@ -4,10 +4,10 @@
     "metadata": {
         "name": "sysbench-test",
         "labels": {
-            "name": "sysbench-test"
+            "name": "sysbench-oltp-test"
         },
         "annotations": {
-            "descriptions": "sysbench running inside pods",
+            "descriptions": "sysbench oltp test running inside pods",
             "tags": "sysbench"
         }
     },
@@ -65,7 +65,7 @@
                                 "mountPath": "${SYSBENCH_RESULTS}"
                             }
                         ],
-                        "command": [ "/bin/bash", "/root/sysbenchose.sh", "-d", "${MOUNT_PATH}","-t", "${THREADS}", "-o", "${OLTP}", "-r", "${SYSBENCH_RESULTS}" ],
+                        "command": [ "/bin/bash", "/root/sysbenchose.sh", "-d", "${MOUNT_PATH}","-t", "${THREADS}", "-o", "${OLTP}", "-r", "${SYSBENCH_RESULTS}"],
                         "securityContext": {
                             "capabilities": {},
                             "privileged": true
