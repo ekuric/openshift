@@ -54,12 +54,20 @@ projects:
       - num: 1
         file: ./sysbench-template.json
         parameters:
+        # oltp parameters
           - STORAGE_CLASS: "storageclass" # this is name of storage class to use
           - STORAGE_SIZE: "3Gi" # this is size of PVC mounted inside pod
           - MOUNT_PATH: "/mnt/pvcmount"
-          - DOCKER_IMAGE: "dockerimage"
-          - THREADS: "1,2,4,8,16,24,48"
           - OLTP: "100000"
+
+        # cpu parameters
+          - CPU_PRIME: "10000"
+          - MAX_REQ: "10000"
+
+        # general parameters
+          - THREADS: "1,2,4,8,16,24,48"
+          - DOCKER_IMAGE: "dockerimage"
+          - TESTTYPE: "cpu"
           - SYSBENCH_RESULTS: "/var/sysbench_results"
 
 tuningsets:
@@ -120,6 +128,11 @@ sysbench preinstalled and `sysbenchose.sh` script inside it - refer dockerfiles 
 sysbench results will be saved, results will be located on host where
 sysbench pod was running during sysbench pod execution
 - OLTP - this is value for ` –oltp-table-size ` sysbench parameter ( *parameters -> OLTP* )
+- CPU_PRIME - for Sysbench CPU test, this is `prime` number to caclulate - refer to sysbench documentation
+- MAX_REQ - maximum number of requests , used in Sysbench CPU test type
+- TESTTYPE - We have support for `CPU` and `OLTP` sysbench test types. We can run
+either `CPU` (TESTTYPE: "cpu") , or `OLTP` ( TESTTYPE: "oltp", or both ( TESTTYPE:"oltpcpu" )
+ during test.Pick up desired test and specifiy it in `sysbench-parameters.yaml` file
 
 For full list of all available parameters, refer to https://github.com/ekuric/openshift/blob/master/sysbench/sysbench-template.json#L94-L166[sysbench-template.json]
 file.
@@ -156,56 +169,10 @@ For above example *sysbench-parameters.yaml* file results will be saved as showe
 
 
 ```
-# ls -l /var/lib/pbench-agent/sysbench-pod-tt3wd/
-total 0
-drwxr-xr-x. 2 root root 41 May  5 07:16 threads_1
-drwxr-xr-x. 2 root root 41 May  5 07:23 threads_16
-drwxr-xr-x. 2 root root 41 May  5 07:20 threads_2
-drwxr-xr-x. 2 root root 41 May  5 07:23 threads_24
-drwxr-xr-x. 2 root root 41 May  5 07:21 threads_4
-drwxr-xr-x. 2 root root 41 May  5 07:23 threads_48
-drwxr-xr-x. 2 root root 41 May  5 07:22 threads_8
-```
-
-for 16 sysbench threads
-
-```
-# cat /var/lib/pbench-agent/sysbench-pod-tt3wd/threads_16/test_2017-05-05-11-14-23.log
-sysbench 0.5:  multi-threaded system evaluation benchmark
-
-Running the test with following options:
-Number of threads: 16
-Random number generator seed is 0 and will be ignored
-
-
-Threads started!
-
-OLTP test statistics:
-    queries performed:
-        read:                            1400014
-        write:                           400004
-        other:                           200002
-        total:                           2000020
-    transactions:                        100001 (4227.65 per sec.)
-    read/write requests:                 1800018 (76097.76 per sec.)
-    other operations:                    200002 (8455.31 per sec.)
-    ignored errors:                      0      (0.00 per sec.)
-    reconnects:                          0      (0.00 per sec.)
-
-General statistics:
-    total time:                          23.6540s
-    total number of events:              100001
-    total time taken by event execution: 378.2507s
-    response time:
-         min:                                  1.85ms
-         avg:                                  3.78ms
-         max:                                318.33ms
-         approx.  95 percentile:               6.89ms
-
-Threads fairness:
-    events (avg/stddev):           6250.0625/185.40
-    execution time (avg/stddev):   23.6407/0.00
-
+# ls -l /var/lib/pbench-agent/pbench-user-benchmark-x.x.x/x/x/sysbench_results
+# ls -l
+-rw-r--r--. 1 root root 2246 May 11 07:02 sysbench_cpu_test_2017-05-11-10-49-36.txt
+-rw-r--r--. 1 root root 3873 May 11 06:57 sysbench_oltp_test_2017-05-11-10-49-36.txt
 
 ```
 
@@ -272,9 +239,9 @@ Threads fairness:
     execution time (avg/stddev):   21.4936/0.00
 
 ```
+==== Known issues
+It does not make sense to chellange your fate and to start `1e6` pods
+with sysbench inside all of them, legend says it will end bad
 
-==== Known Issues
 
-It was noticed that when many sysbench pods are started at same time, some of them will not start MariaDB properly and test will fail.
-This is investigated at time of writing
 

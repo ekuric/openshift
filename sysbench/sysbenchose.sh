@@ -22,7 +22,7 @@ usage() {
         printf -- "-r|--resultdir - the location where sybench results will be saved\n"
         printf -- "--cpuprime - For cpu test we have to specify --cpuprime parameter, eg 10000\n"
         printf -- "--maxreq - For oltp test type this is the value for meximum number of requests\n"
-        printf -- "--testtype - What test type to run , CPU sysbench test, or OLDP sysbench test\n"
+        printf -- "--testtype - Run CPU test: --testtype=cpu,or OLDP test: --testtype=oltp,or both: --testype=oltpcpu\n"
         exit 0
 }
 
@@ -124,11 +124,10 @@ start_oltp_test () {
 
     printf "Running SYSBENCH OLTP test for $THREADS threads\n"
     for numthread in $(echo $THREADS | sed -e s/,/" "/g); do
-        mkdir -p $resultdir/$(hostname -s)
+        mkdir -p "$resultdir"/$(hostname -s)
         printf "Running test with $numthread sysbench threads\n"
-        $sysbench_bin run --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads=$numthread --mysql-table-engine=innodb \
-        --mysql-user=root --mysql-password=mysqlpass --oltp-table-size=$oltp --max-time=1800 --max-requests=$maxreq >> $resultdir/$(hostname -s)/sysbench_oltp_test_$DATE.txt
-        printf "Successfully finished sysbench test for $numthread sysbench threads\n"
+        $sysbench_bin run --test=/sysbench-0.5/sysbench/tests/db/oltp.lua --num-threads="$numthread" --mysql-table-engine=innodb --mysql-user=root --mysql-password=mysqlpass --oltp-table-size="$oltp" --max-time=1800 --max-requests="$maxreq" >> $resultdir/$(hostname -s)/sysbench_oltp_test_$DATE.txt
+        printf "Successfully finished OLTP sysbench test for $numthread threads\n"
     done
 }
 
@@ -136,7 +135,8 @@ start_cpu_test() {
     printf "Running SYSBENCH CPU test for $THREADS threads\n"
     for numthread in $(echo $THREADS | sed -e s/,/" "/g); do
         mkdir -p $resultdir/$(hostname -s)
-        $sysbench_bin --test=cpu --cpu-max-prime=$cpuprime --num-threads=$numthread run >> $resultdir/$(hostname -s)/sysbench_cpu_test_$DATE.txt
+        $sysbench_bin --test=cpu --cpu-max-prime="$cpuprime" --num-threads="$numthread" run >> "$resultdir"/$(hostname -s)/sysbench_cpu_test_$DATE.txt
+        printf "Successfully finished CPU sysbench test for $numthread threads\n"
     done
 }
 
@@ -145,5 +145,8 @@ start_cpu_test() {
 if [ "$testtype" == "oltp" ]; then
     start_oltp_test
 elif [ "$testtype" == "cpu" ]; then
+    start_cpu_test
+elif [ "$testtype" == "oltpcpu" ]; then
+    start_oltp_test
     start_cpu_test
 fi

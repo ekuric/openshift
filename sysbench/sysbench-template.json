@@ -65,7 +65,7 @@
                                 "mountPath": "${SYSBENCH_RESULTS}"
                             }
                         ],
-                        "command": [ "/bin/bash", "/root/sysbenchose.sh", "-d", "${MOUNT_PATH}","-t", "${THREADS}", "-o", "${OLTP}", "-r", "${SYSBENCH_RESULTS}"],
+                        "command": [ "/bin/bash", "/root/sysbenchose.sh", "-d", "${MOUNT_PATH}","-t", "${THREADS}", "-o", "${OLTP}", "-r", "${SYSBENCH_RESULTS}", "--cpuprime", "${CPU_PRIME}", "--maxreq", "${MAX_REQ}", "--testtype", "${TESTTYPE}"],
                         "securityContext": {
                             "capabilities": {},
                             "privileged": true
@@ -163,6 +163,24 @@
         "description": "The location where sysbench will write its output",
         "required": true,
         "value": "/mnt/sysbench_results"
+      },
+      {
+        "name": "CPU_PRIME",
+        "description": "For sysbench CPU test this is CPU prime number value",
+        "required": true,
+        "value": "30000"
+      },
+      {
+        "name": "MAX_REQ",
+        "description": "Limit for total number of OLTP test requests",
+        "required": true,
+        "value": "10000"
+      },
+      {
+        "name": "TESTTYPE",
+        "description": "This template supports CPU or/and OLTP sysbench test types",
+        "required": true,
+        "value": "cpu"
       }
     ]
 }

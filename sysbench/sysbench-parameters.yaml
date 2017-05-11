@@ -13,6 +13,9 @@ projects:
           - THREADS: "1,2,4,8,16,24,48"
           - OLTP: "10000"
           - SYSBENCH_RESULTS: "/var/sysbench_results"
+          - CPU_PRIME: "10000"
+          - MAX_REQ: "10000"
+          - TESTTYPE: "cpu"
 
 tuningsets:
   - name: default
