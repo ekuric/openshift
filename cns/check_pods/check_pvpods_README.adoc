@@ -1,0 +1,41 @@
+### Usage
+
+```
+
+# python check_pvpods.py -h
+usage: check_pvpods.py [-h] [-proto PROTOCOL] [-api BASE_API] [-H HOST]
+                       [-P PORT] [-to TOKEN] [--check_pods] [-ns NS]
+                       [--check_pvc] [--check_pv] [--check_all]
+
+Check pods/pv/pvc on OCP installation
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -proto PROTOCOL, --protocol PROTOCOL
+                        Protocol openshift (Default : https)
+  -api BASE_API, --base_api BASE_API
+                        Url api and version (Default : /api/v1)
+  -H HOST, --host HOST  Host openshift (Default : 127.0.0.1)
+  -P PORT, --port PORT  Port openshift (Default : 8443)
+  -to TOKEN, --token TOKEN
+                        File with token openshift (like -t)
+  --check_pods          Get information about pods
+  -ns NS                The namespace where to look for parameters
+  --check_pvc           Get list of PVCs elemements in desired namespace
+  --check_pv            List of PV volumes
+  --check_all           collect data for PV/PVC and PODS information ...
+
+```
+
+EG.
+
+```
+# python check_pvpods.py -H <ocp_master_hostname> --token <get with oc whoami --show-token> --check_all -ns projectname
+
+```
+
+This will produce
+
+pods/pv/pvc_project.csv/json
+
+
