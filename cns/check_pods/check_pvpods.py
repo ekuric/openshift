@@ -33,8 +33,6 @@ parser.add_argument("--check_pvc", action='store_true', help='Get list of PVCs e
 parser.add_argument("--check_pv", help="List of PV volumes", action='store_true')
 parser.add_argument("--check_all", help="collect data for PV/PVC and PODS information ... ", action='store_true')
 
-parser.add_argument("-v", "--version", action='store_true',
-                    help='Print script version')
 args = parser.parse_args()
 ns = args.ns
 
@@ -91,12 +89,12 @@ class Openshift(object):
             pvc_claims.append(item)
             pvc_claims = sorted(pvc_claims, key=lambda k: k['metadata']['creationTimestamp'],reverse=False)
 
-            with open("allpvc_"+str(ns)+".json", "w") as allpvc:
+            with open("pvc_"+str(ns)+".json", "w") as allpvc:
                 json.dump(pvc_claims, allpvc, indent=4)
 
         # sorted - get stuff properly printed
 
-        with open("pvc"+str(ns)+".csv", 'wb') as cvsout:
+        with open("pvc_"+str(ns)+".csv", 'wb') as cvsout:
             csv_out = csv.writer(cvsout)
             csv_out.writerow(['PVC Name', 'PVC Size' 'PVC Create Time','PVC Create Time - TZ' 'PVC Namespace'])
             for pvc in pvc_claims:
@@ -118,11 +116,11 @@ class Openshift(object):
         for item in parsed_json["items"]:
             pv_volumes.append(item)
             pv_volumes = sorted(pv_volumes, key=lambda k: k['metadata']['creationTimestamp'], reverse=False)
-            with open("allpv_"+str(ns)+".json", "w") as allpv:
+            with open("pv_"+str(ns)+".json", "w") as allpv:
                 json.dump(pv_volumes, allpv, indent=4)
 
 
-        with open("pv"+str(ns)+".csv", 'wb') as csv_pv:
+        with open("pv_"+str(ns)+".csv", 'wb') as csv_pv:
             csv_out = csv.writer(csv_pv)
             csv_out.writerow(['PV Name', 'PVC Name', 'PV Size', 'PV Create Time', 'PV Create Time - TZ', 'PV Namespace'])
             for pv in pv_volumes:
@@ -138,8 +136,6 @@ class Openshift(object):
             self.namespace = ns
 
         api_pods = '%s/namespaces/%s/pods' % (self.base_api, self.namespace)
-        #api_pods = '%s/pods' % (self.base_api)
-
         parsed_json = self.get_json(api_pods)
         pods = []
 
@@ -147,10 +143,10 @@ class Openshift(object):
         for item in parsed_json["items"]:
             pods.append(item)
             pods = sorted(pods, key=lambda k: k["status"]["containerStatuses"][0]["state"]["running"]["startedAt"],reverse=False)
-            with open("allpods_"+str(ns)+".json", "w") as allpods:
+            with open("pods_"+str(ns)+".json", "w") as allpods:
                 json.dump(pods,allpods, indent=4)
 
-        with open("pods"+str(ns)+".csv", 'wb') as csv_pods:
+        with open("pods_"+str(ns)+".csv", 'wb') as csv_pods:
             csv_out = csv.writer(csv_pods,delimiter=",")
             csv_out.writerow(['Pod Name', "Pod Create Time", "Pod Create Time - TZ",
                               "Pod StartTime", "Pod StartTime - TZ", "Pod StartedAt Time",
@@ -169,11 +165,6 @@ class Openshift(object):
 if __name__ == "__main__":
 
     # https://docs.openshift.com/enterprise/3.0/rest_api/openshift_v1.html
-
-    if args.version:
-        print ("Something is broken... check the script!")
-        sys.exit(0)
-
     if not args.token:
         parser.print_help()
         sys.exit()
