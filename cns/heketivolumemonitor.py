@@ -75,7 +75,8 @@ def create_cns():
             response = urllib2.urlopen(urllocation)
             volumes = json.load(response)
             cnsvolumes = volumes.values()
-            startvol.write("Number of running CNS volumes: %s\r\n" % str(len(cnsvolumes[0])))
+            startvol.write("Number of running CNS volumes: %s\r\n" % str(len(cnsvolumes[0])), "waiting to start"
+                                                                                              "additional", numvol, "CNS volumes")
 
         time.sleep (1)
 
