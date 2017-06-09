@@ -16,6 +16,7 @@ parser.add_argument("--port", help="on what port to query, by default we will qu
 parser.add_argument("--volfile", help="file to write heketi volumes number during delete", default="heketivol.txt")
 parser.add_argument("--numvol", help="the number of volumes we want to create, we know this in advance")
 parser.add_argument("--action", help="action can be delete or create")
+parser.add_argument("--delvol", help="number of volumes to delete")
 
 args = parser.parse_args()
 
@@ -24,6 +25,7 @@ port = args.port
 projectname = args.projectname
 volfile = args.volfile
 numvol = args.numvol
+delvol = args.delvol
 
 action = args.action
 
@@ -32,15 +34,17 @@ def delete_cns():
     response = urllib2.urlopen(urllocation)
     volumes = json.load(response)
     cnsvolumes = volumes.values()
-    startvol = len(cnsvolumes[0])-1
+    startvol = int(len(cnsvolumes[0])) -1
+    endvol = int(len(cnsvolumes[0])) - int(delvol)
+    # todo : make possible to delete stuff in multiple projects
+    subprocess.call(["oc", "delete", "pods", "--all", "-n", projectname])
     subprocess.call(["oc", "delete", "pvc", "--all", "-n", projectname])
-    print ("Deleting CNS volumes, necessary to delete", int(startvol), "volumes - waiting now...")
 
     ts = time.time()
 
     while int(len(cnsvolumes[0])) > int(startvol):
         with open(volfile, "a+") as currentvol:
-            currentvol.write("CNS volumes delete not started - CNS volumes present: %s\r\n" % str(len(cnsvolumes[0])))
+            currentvol.write("Present %s CNS volumes, necessary to delete %d CNS volumes\r\n" % (str(len(cnsvolumes[0])), int(delvol)))
         response = urllib2.urlopen(urllocation)
         volumes = json.load(response)
         cnsvolumes = volumes.values()
@@ -48,19 +52,19 @@ def delete_cns():
 
     sd = time.time()
 
-    while len(cnsvolumes[0]) > 1:
+    while len(cnsvolumes[0]) >= endvol+1:
         response = urllib2.urlopen(urllocation)
         volumes = json.load(response)
         cnsvolumes = volumes.values()
         with open(volfile, "a+") as currentvol:
-            currentvol.write("CNS volume delete started - CNS volumes present %s\r\n" % str(len(cnsvolumes[0])))
+            currentvol.write("Delete started, necessary to delete %d CNS volumes\r\n" % int(delvol))
         time.sleep(1)
 
     te = time.time()
 
     with open(volfile, "a+")  as currentvol:
-        currentvol.write("Total deleted CNS volumes: %s\r\nTotal delete time: %s\r\nWait time before delete started: %s\r\n" % (str(startvol), str(te-ts), str(sd-ts)))
-    print ("Total CNS volumes deleted", int(startvol), "delete time", float(te-ts), "seconds")
+        currentvol.write("Deleted: %s\r\nDelete time: %s\r\nWait time before delete started: %s\r\n" % (int(delvol),  str(te-ts), str(sd-ts)))
+    print ("Total CNS volumes deleted", int(delvol), "delete time", float(te-ts), "seconds")
 
 def create_cns():
 
