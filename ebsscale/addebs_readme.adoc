@@ -1,11 +1,22 @@
-https://github.com/ekuric/openshift/blob/master/ebsscale/addebs.py\[addebs.py] is script to allocated desired number of EBS volumes and attach them to instance from where
-script is run.
+**addebs.py** script can be used to allocate desired number of EBS volumes and attach them to instance from where
+**addebs.py** is executed
 
 **Perquisites are **
 
 - it is necessary in advance to run `aws configure` in order to
 have aws credentials properly configure on ec2 machine
+
+```
+# pip install awscli
+# aws configure
+```
+
 - python-boto3 package has to be installed on instance
+
+```
+# yum install python-boto3
+```
+
 
 **Usage**
 
@@ -44,11 +55,11 @@ Other ranges can be be fully used. Keep in mind ec2 http://docs.aws.amazon.com/A
 To allocate devices `/dev/xvdc - /dev/xvdz` and attach them to ec2 instance run
 
 ```
-# python addebs.py --volumesize=1 --vtype=gp2 --tagprefix=ekuric_pv_to_attach --num=24
+# python addebs.py --volumesize=1 --vtype=gp2 --tagprefix=ebs_volume_tag --num=24
 ```
 
 To allocate devices from range `/dev/xvdba  - /dev/xvdbz` run
 
 ```
-#python addebs.py --volumesize=1 --vtype=gp2 --tagprefix=ekuric_pv_to_attach --num=26 --base=b
+#python addebs.py --volumesize=1 --vtype=gp2 --tagprefix=ebs_volume_tag --num=26 --base=b
 ```
