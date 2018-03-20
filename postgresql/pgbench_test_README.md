@@ -18,7 +18,7 @@ The following options are available:
 		-v --volsize the size of volume for database
 		-m --memsize the size of memory to assign to postgresql pod
 		-i --iterations how many iterations of test to execute
-		-m --mode what mode to run: file or blockprintf: usage: printf [-v var] format [arguments]
+		-m --mode what mode to run: file or block 
 
 ``` 
 
