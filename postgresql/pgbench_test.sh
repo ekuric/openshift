@@ -104,6 +104,8 @@ function run_test {
         # This is temporarly hack before find better mode to manage passwrds 
         # do not want to be prompted for password 
         echo "$SERVICE:5432:*:$USER:$PASS" >> /root/.pgpass
+        chmod 600 /root/.pgpass 
+
         printf "Running test preparation\n" 
         pgbench -h $SERVICE -p 5432  -i -s $transactions sampledb -U $USER
 
@@ -135,12 +137,12 @@ function volume_setup {
 # necessary to polish this ... 
 case $mode in
     block)
-	    create_pod
+        create_pod
         run_test 	
     ;;
     file)
-	    create_pod
+        create_pod
         volume_setup
-	    run_test
+        run_test
     ;;
 esac 
