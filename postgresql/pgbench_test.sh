@@ -3,7 +3,7 @@
 # Script to to run pgbench load test against postgresql pod in kubernetes/Openshift
   
 
-opts=$(getopt -q -o n:t:e:v:m:i: --longoptions "namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:" -n "getopt.sh" -- "$@");
+opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:" -n "getopt.sh" -- "$@");
 
 if [ $? -ne 0 ]; then
     printf -- "$*\n"
@@ -16,8 +16,8 @@ if [ $? -ne 0 ]; then
     printf -- "\t\t-v --volsize the size of volume for database\n"
     printf -- "\t\t-m --memsize the size of memory to assign to postgresql pod\n"
     printf -- "\t\t-i --iterations how many iterations of test to execute\n"
-    printf -- "\t\t-m --mode what mode to run: file or block"
-    printf 
+    printf -- "\t\t-m --mode what mode to run: cnsfile or cnsblock, or otherstorage\n"
+    printf -- "\t\t-r --resultdir name of directory where to place pgbench results\n"
     exit 1 
 fi
 
@@ -75,6 +75,14 @@ while true; do
                 shift
             fi
         ;;
+        -r|--resultdir)
+            shift; 
+            if [ -n "$1" ]; then 
+                resultdir="$1"
+                mkdir $resultdir 
+                shift; 
+            fi 
+        ;; 
         --)
             break;
         ;;
@@ -89,10 +97,8 @@ function create_pod {
         oc new-project $namespace 
         oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize}Gi
         while [ "$(oc get pods | grep -v deploy | awk '{print $3}' | grep -v STATUS)" != "Running" ] ; do 
-	        printf "sleeping 5s, waiting postgresql pod to fully start"
 	        sleep 5
         done 
-        printf "postgresql is started - waiting 30s before proceed"
         sleep 30 
 } 
 
@@ -110,10 +116,19 @@ function run_test {
         pgbench -h $SERVICE -p 5432  -i -s $transactions sampledb -U $USER
 
     # run x itterations of test 
-        for m in $(seq 1 $iterations); do 
-	        pgbench -h $SERVICE -p 5432  -c 10 -j 2 -t $transactions sampledb -U $USER >> $benchmark_run_dir/pgbench_run_$m.txt 
-	        grep "excluding connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $benchmark_run_dir/excluding_connection_establishing.txt 
-	        grep "including connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $benchmark_run_dir/including_connections_establishing.txt 
+        for m in $(seq 1 $iterations); do
+            if [ -n "$resultdir" ]; then 
+                pgbench -h $SERVICE -p 5432  -c 10 -j 2 -t $transactions sampledb -U $USER >> $resultdir/pgbench_run_$m.txt 
+	            grep "excluding connections establishing" $resultdir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $resultdir/excluding_connection_establishing.txt 
+	            grep "including connections establishing" $resultdir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $resultdir/including_connections_establishing.txt 
+                # if pbench-user-benchmark is used, then $benchmark_run_dir variable will be present and results will 
+                # be sent to it 
+            elif [ ! -z "$benchmark_run_dir" ]; then 
+                pgbench -h $SERVICE -p 5432  -c 10 -j 2 -t $transactions sampledb -U $USER >> $benchmark_run_dir/pgbench_run_$m.txt 
+	            grep "excluding connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $benchmark_run_dir/excluding_connection_establishing.txt 
+	            grep "including connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $benchmark_run_dir/including_connections_establishing.txt 
+            fi 
+
         done 
 } 
 
@@ -123,7 +138,8 @@ function volume_setup {
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
     PV=$(oc get pvc | grep Bound | awk '{print $3}')
     GLUSTERVOLUME=$(oc describe pv $PV | grep vol_  | awk '{print $2}')
-
+    # todo : get some better way to specify these gluster volume parameters 
+    
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.stat-prefetch off
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.write-behind off
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.strict-o-direct on 
@@ -136,13 +152,16 @@ function volume_setup {
 
 # necessary to polish this ... 
 case $mode in
-    block)
+    cnsblock)
         create_pod
         run_test 	
     ;;
-    file)
+    cnsfile)
         create_pod
         volume_setup
         run_test
     ;;
+    otherstorage)
+        create_pod
+        run_test
 esac 
