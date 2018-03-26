@@ -1,7 +1,7 @@
 ### pgbench load tool for OCP pods 
 
 
-pgbench_test.sh script can be used for executing pgbench benchmark tool
+[pgbench_test.sh](https://github.com/ekuric/openshift/blob/master/postgresql/pgbench_test.sh) script can be used for executing pgbench benchmark tool
 inside postgresql pod running on top of Kubernetes / OpenShift Container Platform (OCP) when CNS ( Container Native Storage )
 is used as storage backend for Postgresql pod
 
