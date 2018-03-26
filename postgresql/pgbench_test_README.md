@@ -46,12 +46,12 @@ pgbench_test.sh can be used as standalone script
 - standalone case 
 
 ```
-./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> -m <mode> -r resultdir 
+./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir 
 ```
 - as input script for pbench-user-benchmark 
 
 ```
-# pbench-user-benchmark --config="config_name" -- ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> -m <mode> 
+# pbench-user-benchmark --config="config_name" -- ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> 
 ``` 
 Where ```mode``` can be either ```cnsblock```, ```cnsfile```, or ```otherstorage```  
 
