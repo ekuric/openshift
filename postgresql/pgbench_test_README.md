@@ -65,8 +65,9 @@ Example how to edit PVclaim section in template is showed below
 ``` 
         ...
         ....
-		"annotations":
-			"volume.beta.kubernetes.io/storage-class": "glusterblock"
+		"annotations":{
+			"volume.beta.kubernetes.io/storage-class": "glusterblock"	
+			}, 
                 "name": "${DATABASE_SERVICE_NAME}"
             },
             .... 
