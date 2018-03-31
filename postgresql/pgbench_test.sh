@@ -3,21 +3,24 @@
 # Script to to run pgbench load test against postgresql pod in kubernetes/Openshift
   
 
-opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:" -n "getopt.sh" -- "$@");
+opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:,clients:,threads:,storageclass:" -n "getopt.sh" -- "$@");
 
 if [ $? -ne 0 ]; then
     printf -- "$*\n"
     printf "\n"
     printf "You specified an invalid option\n"
     printf "\tThe following options are available:\n\n"
-    printf -- "\t\t-n str --namespace=str name for new namespace to create pod inside\n"
-    printf -- "\t\t-t str[,str] --transactions=str[,str] the number pgbench transactions\n"
-    printf -- "\t\t-e str[,str] --template=str[,str what template to use\n"
-    printf -- "\t\t-v --volsize the size of volume for database\n"
-    printf -- "\t\t-m --memsize the size of memory to assign to postgresql pod\n"
-    printf -- "\t\t-i --iterations how many iterations of test to execute\n"
-    printf -- "\t\t-m --mode what mode to run: cnsfile or cnsblock, or otherstorage\n"
-    printf -- "\t\t-r --resultdir name of directory where to place pgbench results\n"
+    printf -- "\t\t-n --namespace - name for new namespace to create pod inside\n"
+    printf -- "\t\t-t --transactions - the number pgbench transactions\n"
+    printf -- "\t\t-e --template -  what template to use\n"
+    printf -- "\t\t-v --volsize - size of volume for database\n"
+    printf -- "\t\t-m --memsize - size of memory to assign to postgresql pod\n"
+    printf -- "\t\t-i --iterations - how many iterations of test to execute\n"
+    printf -- "\t\t --mode - what mode to run: cnsfile or cnsblock, or otherstorage\n"
+    printf -- "\t\t-r --resultdir - name of directory where to place pgbench results\n"
+    printf -- "\t\t --clients - number of pgbench clients\n"
+    printf -- "\t\t --threads - number of pgbench threads\n"
+    printf -- "\t\t --storageclass - name of storageclass to use to allocate storage\n"
     exit 1 
 fi
 
@@ -83,6 +86,27 @@ while true; do
                 shift; 
             fi 
         ;; 
+        --clients)
+            shift;
+            if [ -n "$1" ]; then
+                clients="$1"
+                shift;
+            fi
+        ;;
+        --threads)
+            shift;
+            if [ -n "$1" ]; then 
+                threads="$1"
+                shift;
+            fi 
+        ;; 
+        --storageclass)
+            shift; 
+            if [ -n "$1" ]; then 
+                storageclass="$1"
+                shift;
+            fi 
+        ;; 
         --)
             break;
         ;;
@@ -95,7 +119,7 @@ done
 
 function create_pod {
         oc new-project $namespace 
-        oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize}Gi
+        oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize}Gi -p STORAGE_CLASS=${storageclass}
         while [ "$(oc get pods | grep -v deploy | awk '{print $3}' | grep -v STATUS)" != "Running" ] ; do 
 	        sleep 5
         done 
@@ -104,27 +128,20 @@ function create_pod {
 
 function run_test { 
         POD=$(oc get pods | grep postgresql | grep -v deploy | awk '{print $1}')
-        SERVICE=$(oc exec $POD -- env | grep -i ^POSTGRESQL_SERVICE_HOST | cut -d'=' -f2)
-        USER=$(oc exec $POD -- env | grep -i POSTGRESQL_USER | cut -d'=' -f2)
-        PASS=$(oc exec $POD -- env | grep -i POSTGRESQL_PASSWORD | cut -d'=' -f2)
-        # This is temporarly hack before find better mode to manage passwrds 
-        # do not want to be prompted for password 
-        echo "$SERVICE:5432:*:$USER:$PASS" >> /root/.pgpass
-        chmod 600 /root/.pgpass 
 
-        printf "Running test preparation\n" 
-        pgbench -h $SERVICE -p 5432  -i -s $transactions sampledb -U $USER
+        printf "Running test preparation\n"
+        oc exec -i $POD -- bash -c "pgbench -i -s $transactions sampledb"
 
     # run x itterations of test 
         for m in $(seq 1 $iterations); do
-            if [ -n "$resultdir" ]; then 
-                pgbench -h $SERVICE -p 5432  -c 10 -j 2 -t $transactions sampledb -U $USER >> $resultdir/pgbench_run_$m.txt 
+            if [ -n "$resultdir" ]; then
+                oc exec -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" >> $resultdir/pgbench_run_$m.txt 
 	            grep "excluding connections establishing" $resultdir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $resultdir/excluding_connection_establishing.txt 
 	            grep "including connections establishing" $resultdir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $resultdir/including_connections_establishing.txt 
                 # if pbench-user-benchmark is used, then $benchmark_run_dir variable will be present and results will 
                 # be sent to it 
             elif [ ! -z "$benchmark_run_dir" ]; then 
-                pgbench -h $SERVICE -p 5432  -c 10 -j 2 -t $transactions sampledb -U $USER >> $benchmark_run_dir/pgbench_run_$m.txt 
+                oc exec -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" >> $benchmark_run_dir/pgbench_run_$m.txt
 	            grep "excluding connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $benchmark_run_dir/excluding_connection_establishing.txt 
 	            grep "including connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $benchmark_run_dir/including_connections_establishing.txt 
             fi 
