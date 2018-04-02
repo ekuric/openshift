@@ -2,9 +2,8 @@
 
 
 [pgbench_test.sh](https://github.com/ekuric/openshift/blob/master/postgresql/pgbench_test.sh) script can be used for executing pgbench benchmark tool
-inside postgresql pod running on top of Kubernetes / OpenShift Container Platform (OCP) when CNS ( Container Native Storage )
-is used as storage backend for Postgresql pod
-
+inside postgresql pod running on top of Kubernetes / OpenShift Container Platform (OCP) when storage can be allocated 
+dynamically using storage classes
 
 ### Supported options 
 
@@ -13,45 +12,46 @@ pgbench_test.sh supports below options
 ``` 
 The following options are available:
 
-		-n str --namespace=str name for new namespace to create pod inside
-		-t str[,str] --transactions=str[,str] the number pgbench transactions
-		-e str[,str] --template=str[,str what template to use
-		-v --volsize the size of volume for database
-		-m --memsize the size of memory to assign to postgresql pod
-		-i --iterations how many iterations of test to execute
-		-m --mode what mode to run: ```cnsfile```, ```cnsblock```, or ```otherstorage```
-		-r --resultdir name of directory where to place pgbench results
+		-n --namespace - name for new namespace to create pod inside
+		-t --transactions - the number pgbench transactions
+		-e --template -  what template to use
+		-v --volsize - size of volume for database
+		-m --memsize - size of memory to assign to postgresql pod
+		-i --iterations - how many iterations of test to execute
+		 --mode - what mode to run: cnsfile or cnsblock, or otherstorage
+		-r --resultdir - name of directory where to place pgbench results
+		 --clients - number of pgbench clients
+		 --threads - number of pgbench threads
+		 --storageclass - name of storageclass to use to allocate storage
 
 ``` 
 
 ### Setup
 
-pgbench_test.sh exepcts below to be in place and functioning before executing it 
+pgbench_test.sh exepects below to be in place and functioning before executing it
 
-- pgbench_test.sh can be executed as standalone script 
+- when executed as standalone script pgbench_test.sh does not require any prerequest 
+For this test case, check below hot to run it
 
-In case there is need to run it as user script for [pbench](https://github.com/distributed-system-analysis/pbench)
-then below must be satisfied prior executing it 
+- when used as input script for [pbench](https://github.com/distributed-system-analysis/pbench) pbench-user-benchmark script
+
+For pbench test case, it is necessary to have below in order to make it work 
 
 - installed and properly setup pbench from [pbench](https://github.com/distributed-system-analysis/pbench)
 - installed pgbench ( on centos/rhel it is part of `postgresql-contrib package`)
-- template which supports dynamic storage provision using storage classes 
-
-
-pgbench_test.sh is can be used to run as input script to pbench-user-benchmark
-pgbench_test.sh can be used as standalone script 
+- template which supports dynamic storage provision using storage classes
 
 ### Usage:  
 
 - standalone case 
 
 ```
-./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir 
+./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir --clients <number of clients> -- threads <number of threads> --storageclass <name of storageclass>
 ```
 - as input script for pbench-user-benchmark 
 
 ```
-# pbench-user-benchmark --config="config_name" -- ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> 
+# pbench-user-benchmark --config="config_name" -- ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir --clients <number of clients> -- threads <number of threads> --storageclass <name of storageclass> 
 ``` 
 Where ```mode``` can be either ```cnsblock```, ```cnsfile```, or ```otherstorage```  
 
@@ -60,24 +60,36 @@ Where ```mode``` can be either ```cnsblock```, ```cnsfile```, or ```otherstorage
 - for `cnsfile` case template requirement for template is to use storageclass based on cns file 
 - as it can be clear from name, ```otherstorage``` means any other storage configured in storage class section inside template used for postgresql 
 
-Example how to edit PVclaim section in template is showed below 
+Example how to edit PVClaim section in template is showed below 
 
 ``` 
         ...
         ....
 		"annotations":{
-			"volume.beta.kubernetes.io/storage-class": "glusterblock"	
+			"volume.beta.kubernetes.io/storage-class": "${STORAGE_CLASS}"	
 			}, 
                 "name": "${DATABASE_SERVICE_NAME}"
             },
-            .... 
             ....
 ``` 
 
+add also in ```parameters``` section 
 
+```
+	{
+	   "description": "Storage class to use",
+	   "displayName": "Storage class name",
+	   "name": "STORAGE_CLASS",
+	   "required": true, 
+           "value": "glusterfs-storage-block" 
+	}
+``` 
+
+
+Example usage with pbench-user-benchmark 
 
 ``` 
-# pbench-user-benchmark --config="test_postgresql" -- ./pgbench_test.sh -n pgblock -t 100 -e glusterblock-postgresql-persistent -v 20 -m 2 -i 5 --mode cnsfile 
+# pbench-user-benchmark --config="test_postgresql" -- ./pgbench_test.sh -n pgblock -t 100 -e glusterblock-postgresql-persistent -v 20 -m 2 -i 5 --mode cnsblock --threads 2 --clients 10 --storageclass glusterfs-storage 
 ``` 
 
 ### Todo 
