@@ -14,6 +14,7 @@ The following options are available:
 
 		-n --namespace - name for new namespace to create pod inside
 		-t --transactions - the number pgbench transactions
+		   --scaling - pgbench scaling factor
 		-e --template -  what template to use
 		-v --volsize - size of volume for database
 		-m --memsize - size of memory to assign to postgresql pod
