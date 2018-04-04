@@ -3,7 +3,7 @@
 # Script to to run pgbench load test against postgresql pod in kubernetes/Openshift
   
 
-opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:,clients:,threads:,storageclass:" -n "getopt.sh" -- "$@");
+opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:,clients:,scaling:,threads:,storageclass:" -n "getopt.sh" -- "$@");
 
 if [ $? -ne 0 ]; then
     printf -- "$*\n"
@@ -12,6 +12,7 @@ if [ $? -ne 0 ]; then
     printf "\tThe following options are available:\n\n"
     printf -- "\t\t-n --namespace - name for new namespace to create pod inside\n"
     printf -- "\t\t-t --transactions - the number pgbench transactions\n"
+    printf -- "\t\t   --scaling - pgbench scaling factor"
     printf -- "\t\t-e --template -  what template to use\n"
     printf -- "\t\t-v --volsize - size of volume for database\n"
     printf -- "\t\t-m --memsize - size of memory to assign to postgresql pod\n"
@@ -106,6 +107,13 @@ while true; do
                 storageclass="$1"
                 shift;
             fi 
+        ;;
+        --scaling)
+            shift;
+            if [ -n "$1" ]; then 
+                scaling="$1"
+                shift;
+            fi 
         ;; 
         --)
             break;
@@ -130,7 +138,7 @@ function run_test {
         POD=$(oc get pods | grep postgresql | grep -v deploy | awk '{print $1}')
 
         printf "Running test preparation\n"
-        oc exec -i $POD -- bash -c "pgbench -i -s $transactions sampledb"
+        oc exec -i $POD -- bash -c "pgbench -i -s $scaling sampledb"
 
     # run x itterations of test 
         for m in $(seq 1 $iterations); do
