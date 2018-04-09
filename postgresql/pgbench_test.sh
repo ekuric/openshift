@@ -175,18 +175,27 @@ function volume_setup {
     # add more options here - make it parameters 
 }
 
+function delete_project {
+    oc project default 
+    oc delete project $namespace
+    sleep 100 
+}
+
 # necessary to polish this ... 
 case $mode in
     cnsblock)
         create_pod
         run_test 	
+        delete_project
     ;;
     cnsfile)
         create_pod
         volume_setup
         run_test
+        delete_project
     ;;
     otherstorage)
         create_pod
         run_test
+        delete_project
 esac 
