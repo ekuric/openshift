@@ -1,0 +1,68 @@
+#!/usr/bin/env groovy
+
+def setup_tooling = SETUP_TOOLING.toString().toUpperCase()
+def run_conformance = CONFORMANCE.toString().toUpperCase()
+def openshift_install = OPENSHIFT_INSTALL.toString().toUpperCase()
+def nodevertical = NODEVERTICAL_SCALE_TEST.toString().toUpperCase()
+def mastervertical = MASTERVERTICAL_SCALE_TEST.toString().toUpperCase()
+def install_openstack = OPENSTACK_INSTALL.toString().toUpperCase()
+def browbeat = BROWBEAT_INSTALL.toString().toUpperCase()
+def scaleup = OPENSHIFT_SCALEUP.toString().toUpperCase()
+
+node {
+    // clear workspace
+    deleteDir()
+    // clone aos-cd-jobs repo where all the pipeline scripts exist
+    sh "git clone https://github.com/chaitanyaenr/aos-cd-jobs.git aos-cd-jobs; cd aos-cd-jobs; git checkout tooling"
+
+    // stage to install openstack
+    if (install_openstack == "TRUE") {
+        load "aos-cd-jobs/pipeline-scripts/setup_openstack.groovy"
+    }
+
+    // stage to set up browbeat
+    if (browbeat == "TRUE") {
+        load "aos-cd-jobs/pipeline-scripts/browbeat.groovy"
+    }
+
+    // stage to install openshift
+    if (openshift_install == "TRUE") {
+	load "aos-cd-jobs/pipeline-scripts/scale-ci.groovy"
+    }
+    
+    // stage to setup pbench
+    if (setup_tooling == "TRUE") {
+        load "aos-cd-jobs/pipeline-scripts/tooling.groovy"
+    }
+
+    // stage to run conformance
+    if (run_conformance == "TRUE") {
+	load "aos-cd-jobs/pipeline-scripts/conformance.groovy"
+    }
+
+    // stage to scaleup the cluster
+    if (scaleup == "TRUE") {
+        load "aos-cd-jobs/pipeline-scripts/scaleup.groovy"
+    }
+
+    // stage to run nodevertical scale test
+    if (nodevertical == "TRUE") {
+        load "aos-cd-jobs/pipeline-scripts/nodevertical.groovy"
+    }
+
+    // stage to run mastervertical scale test
+    if (mastervertical == "TRUE") {
+        load "aos-cd-jobs/pipeline-scripts/mastervertical.groovy"
+    }
+
+    // stage to run http scale test
+//    if (http == "TRUE") {
+//        load "aos-cd-jobs/pipeline-scripts/http.groovy"
+//    }
+    mail(
+    	to: 'nelluri@redhat.com',
+        subject: 'Scale-ci pipeline completed successfully',
+        body: """\
+        Jenkins job: ${env.BUILD_URL}
+    """)
+}

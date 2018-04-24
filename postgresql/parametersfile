@@ -1,0 +1,12 @@
+namespace=postgresqltest
+transactions=10
+template=cns-postgresql-persistent
+vgsize=10
+memsize=5
+iterations=10 
+mode=cnsblock 
+clients=10
+threads=2 
+scaling=10
+pbenchconfig=pbenchtest
+storageclass=glusterfs-storage-block
