@@ -7,7 +7,7 @@ node {
     // clear workspace
     deleteDir()
     // clone aos-cd-jobs repo where all the pipeline scripts exist
-    sh "git clone hhttps://github.com/ekuric/openshift"
+    sh "git clone https://github.com/ekuric/openshift"
 
     // run pgbench 
     if ( pgbench_test == "TRUE" ) {
