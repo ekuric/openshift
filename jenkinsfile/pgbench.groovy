@@ -50,7 +50,7 @@ stage ('pgbench_scale_test') {
 			println "MODE: '${mode}'"
 			println "CLIENTS: '${clients}'"
 			println "SCALING: '${scaling}'"
-                        println "PGBENCHCONFIG: '${pgbenchconfig}'"
+                        println "PBENCHCONFIG: '${pbenchconfig}'"
                         println "STORAGECLASS: '${storageclass}'" 
 
 	                println "-------------------------------------------------"
