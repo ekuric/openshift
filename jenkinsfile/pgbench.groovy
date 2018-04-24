@@ -72,7 +72,7 @@ stage ('pgbench_scale_test') {
                                                 [$class: 'StringParameterValue', name: 'CLIENTS', value: clients],
                                                 [$class: 'StringParameterValue', name: 'SCALING', value: scaling], 
                                                 [$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: pbenchconfig],
-                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: storageclass],
+                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: storageclass]]
                         } catch ( Exception e) {
                         echo "PGBENCH_SCALE_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
