@@ -32,7 +32,7 @@ stage ('pgbench_scale_test') {
 			def mode = pgbench_scale_test_properties['MODE']
 			def clients = pgbench_scale_test_properties['CLIENTS']
 			def scaling = pgbench_scale_test_properties['SCALING']
-                        def pbenchconfig = pgbench_scale_test_properties['PGBENCHCONFIG']
+                        def pbenchconfig = pgbench_scale_test_properties['PBENCHCONFIG']
                         def storageclass = pgbench_scale_test_properties['STORAGECLASS  ']
 
 
