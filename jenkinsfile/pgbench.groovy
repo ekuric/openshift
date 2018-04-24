@@ -23,17 +23,17 @@ stage ('pgbench_scale_test') {
                         // sh "wget ${PGBENCH_SCALE_TEST_PROPERTY_FILE}"
                         sh "cat pgbench.properties"
 			def pgbench_scale_test_properties = readProperties file: "pgbench.properties"
-                        def namespace = pgbench_scale_test_properties['NAMESPACE']
-                        def transactions = pgbench_scale_test_properties['TRANSACTIONS']
-                        def template = pgbench_scale_test_properties['TEMPLATE']
-			def vgsize = pgbench_scale_test_properties['VGSIZE']
-			def memsize = pgbench_scale_test_properties['MEMSIZE']
-			def iterations = pgbench_scale_test_properties['ITERATIONS']
-			def mode = pgbench_scale_test_properties['MODE']
-			def clients = pgbench_scale_test_properties['CLIENTS']
-			def scaling = pgbench_scale_test_properties['SCALING']
-                        def pbenchconfig = pgbench_scale_test_properties['PBENCHCONFIG']
-                        def storageclass = pgbench_scale_test_properties['STORAGECLASS  ']
+                        def namespace = pgbench_scale_test_properties['namespace']
+                        def transactions = pgbench_scale_test_properties['transactions']
+                        def template = pgbench_scale_test_properties['template']
+			def vgsize = pgbench_scale_test_properties['vgsize']
+			def memsize = pgbench_scale_test_properties['memsize']
+			def iterations = pgbench_scale_test_properties['iterations']
+			def mode = pgbench_scale_test_properties['mode']
+			def clients = pgbench_scale_test_properties['clients']
+			def scaling = pgbench_scale_test_properties['scaling']
+                        def pbenchconfig = pgbench_scale_test_properties['pbenchconfig']
+                        def storageclass = pgbench_scale_test_properties['storageclass']
 
 
 			
