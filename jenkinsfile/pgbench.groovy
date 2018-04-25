@@ -9,7 +9,8 @@ def pgbench_test = PGBENCH_TEST.toString().toUpperCase()
 stage ('pgbench_scale_test') {
           if ( pgbench_test == "TRUE") {
                 currentBuild.result = "SUCCESS"
-                node('CCI && US') {
+		// node('CCI && US')
+                node {
                         // get properties file
                         if (fileExists("pgbench.properties")) {
                                 println "pgbench_scale_test.properties file exist... deleting it..."
