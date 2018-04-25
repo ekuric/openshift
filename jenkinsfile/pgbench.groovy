@@ -65,6 +65,7 @@ stage ('pgbench_scale_test') {
                         try {
                            pgbench_build = build job: 'PGBENCH_SCALE_TEST',
                                 parameters: [    
+						[$class: 'LabelParameterValue', name: 'node', label: node_label ],
                                                 [$class: 'StringParameterValue', name: 'NAMESPACE', value: NAMESPACE ],
                                                 [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: TRANSACTIONS ],
                                                 [$class: 'StringParameterValue', name: 'TEMPLATE', value: TEMPLATE ],
