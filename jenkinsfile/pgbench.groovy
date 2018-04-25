@@ -31,6 +31,7 @@ stage ('pgbench_scale_test') {
 			def ITERATIONS = pgbench_scale_test_properties['ITERATIONS']
 			def MODE = pgbench_scale_test_properties['MODE']
 			def CLIENTS = pgbench_scale_test_properties['CLIENTS']
+			def THREADS = pgbench_scale_test_properties['THREADS']
 			def SCALING = pgbench_scale_test_properties['SCALING']
                         def PBENCHCONFIG = pgbench_scale_test_properties['PBENCHCONFIG']
                         def STORAGECLASS = pgbench_scale_test_properties['STORAGECLASS']
@@ -49,6 +50,7 @@ stage ('pgbench_scale_test') {
 			println "ITERATIONS: '${ITERATIONS}'"
 			println "MODE: '${MODE}'"
 			println "CLIENTS: '${CLIENTS}'"
+			println "THREADS: '${THREADS}'" 
 			println "SCALING: '${SCALING}'"
                         println "PBENCHCONFIG: '${PBENCHCONFIG}'"
                         println "STORAGECLASS: '${STORAGECLASS}'" 
@@ -71,6 +73,7 @@ stage ('pgbench_scale_test') {
                                                 [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
                                                 [$class: 'StringParameterValue', name: 'MODE', value: MODE ],
                                                 [$class: 'StringParameterValue', name: 'CLIENTS', value: CLIENTS ],
+						[$class: 'StringParameterValue', name: 'THREADS', value: THREADS ],
                                                 [$class: 'StringParameterValue', name: 'SCALING', value: SCALING ], 
                                                 [$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: PBENCHCONFIG ],
                                                 [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ]]
