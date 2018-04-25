@@ -11,7 +11,7 @@ stage ('pgbench_scale_test') {
                 currentBuild.result = "SUCCESS"
                 node('CCI && US') {
                         // get properties file
-                        if (fileExists("pgbench_scale_test.properties")) {
+                        if (fileExists("pgbench.properties")) {
                                 println "pgbench_scale_test.properties file exist... deleting it..."
                                 sh "rm pgbench.properties"
                         }
@@ -61,7 +61,8 @@ stage ('pgbench_scale_test') {
                         // PGBENCH_SCALE_TEST is actually name of jenkins job - it must be configured in advance 
                         try {
                            pgbench_build = build job: 'PGBENCH_SCALE_TEST',
-                                parameters: [   [$class: 'StringParameterValue', name: 'NAMESPACE', value: namespace ],
+                                parameters: [   [$class: 'LabelParameterValue', name: 'node', label: node_label ], 
+                                                [$class: 'StringParameterValue', name: 'NAMESPACE', value: namespace ],
                                                 [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: transactions ],
                                                 [$class: 'StringParameterValue', name: 'TEMPLATE', value: template ],
                                                 [$class: 'StringParameterValue', name: 'VGSIZE',value: vgsize],
