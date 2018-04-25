@@ -23,17 +23,17 @@ stage ('pgbench_scale_test') {
                         // sh "wget ${PGBENCH_SCALE_TEST_PROPERTY_FILE}"
                         sh "cat pgbench.properties"
 			def pgbench_scale_test_properties = readProperties file: "pgbench.properties"
-                        def namespace = pgbench_scale_test_properties['namespace']
-                        def transactions = pgbench_scale_test_properties['transactions']
-                        def template = pgbench_scale_test_properties['template']
-			def vgsize = pgbench_scale_test_properties['vgsize']
-			def memsize = pgbench_scale_test_properties['memsize']
-			def iterations = pgbench_scale_test_properties['iterations']
-			def mode = pgbench_scale_test_properties['mode']
-			def clients = pgbench_scale_test_properties['clients']
-			def scaling = pgbench_scale_test_properties['scaling']
-                        def pbenchconfig = pgbench_scale_test_properties['pbenchconfig']
-                        def storageclass = pgbench_scale_test_properties['storageclass']
+                        def namespace = pgbench_scale_test_properties['NAMESPACE']
+                        def transactions = pgbench_scale_test_properties['TRANSACTIONS']
+                        def template = pgbench_scale_test_properties['TEMPLATE']
+			def vgsize = pgbench_scale_test_properties['VGSIZE']
+			def memsize = pgbench_scale_test_properties['MEMSIZE']
+			def iterations = pgbench_scale_test_properties['ITERATIONS']
+			def mode = pgbench_scale_test_properties['MODE']
+			def clients = pgbench_scale_test_properties['CLIENTS']
+			def scaling = pgbench_scale_test_properties['SCALING']
+                        def pbenchconfig = pgbench_scale_test_properties['PBENCHCONFIG']
+                        def storageclass = pgbench_scale_test_properties['STORAGECLASS']
 
 
 			
@@ -41,17 +41,17 @@ stage ('pgbench_scale_test') {
 			println "----------USER DEFINED OPTIONS-------------------"
 			println "-------------------------------------------------"
 			println "-------------------------------------------------"
-                        println "NAMESPACE: '${namespace}'"
-                        println "TRANSACTIONS: '${transactions}'"
-                        println "TEMPLATE: '${template}'"
-			println "VGSIZE: '${vgsize}'"
-			println "MEMSIZE: '${memsize}'"
-			println "ITERATIONS: '${iterations}'"
-			println "MODE: '${mode}'"
-			println "CLIENTS: '${clients}'"
-			println "SCALING: '${scaling}'"
-                        println "PBENCHCONFIG: '${pbenchconfig}'"
-                        println "STORAGECLASS: '${storageclass}'" 
+                        println "NAMESPACE: '${NAMESPACE}'"
+                        println "TRANSACTIONS: '${TRANSACTIONS}'"
+                        println "TEMPLATE: '${TEMPLATE}'"
+			println "VGSIZE: '${VGSIZE}'"
+			println "MEMSIZE: '${MEMSIZE}'"
+			println "ITERATIONS: '${ITERATIONS}'"
+			println "MODE: '${MODE}'"
+			println "CLIENTS: '${CLIENTS}'"
+			println "SCALING: '${SCALING}'"
+                        println "PBENCHCONFIG: '${PBENCHCONFIG}'"
+                        println "STORAGECLASS: '${STORAGECLASS}'" 
 
 	                println "-------------------------------------------------"
 			println "-------------------------------------------------"
@@ -63,17 +63,17 @@ stage ('pgbench_scale_test') {
                         try {
                            pgbench_build = build job: 'PGBENCH_SCALE_TEST',
                                 parameters: [    
-                                                [$class: 'StringParameterValue', name: 'NAMESPACE', value: namespace ],
-                                                [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: transactions ],
-                                                [$class: 'StringParameterValue', name: 'TEMPLATE', value: template ],
-                                                [$class: 'StringParameterValue', name: 'VGSIZE',value: vgsize],
-                                                [$class: 'StringParameterValue', name: 'MEMSIZE', value: memsize], 
-                                                [$class: 'StringParameterValue', name: 'ITERATIONS', value: iterations],
-                                                [$class: 'StringParameterValue', name: 'MODE', value: mode],
-                                                [$class: 'StringParameterValue', name: 'CLIENTS', value: clients],
-                                                [$class: 'StringParameterValue', name: 'SCALING', value: scaling], 
-                                                [$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: pbenchconfig],
-                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: storageclass]]
+                                                [$class: 'StringParameterValue', name: 'NAMESPACE', value: NAMESPACE ],
+                                                [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: TRANSACTIONS ],
+                                                [$class: 'StringParameterValue', name: 'TEMPLATE', value: TEMPLATE ],
+                                                [$class: 'StringParameterValue', name: 'VGSIZE',value: VGSIZE ],
+                                                [$class: 'StringParameterValue', name: 'MEMSIZE', value: MEMSIZE ], 
+                                                [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
+                                                [$class: 'StringParameterValue', name: 'MODE', value: MODE ],
+                                                [$class: 'StringParameterValue', name: 'CLIENTS', value: CLIENTS ],
+                                                [$class: 'StringParameterValue', name: 'SCALING', value: SCALING ], 
+                                                [$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: PBENCHCONFIG ],
+                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ]]
                         } catch ( Exception e) {
                         echo "PGBENCH_SCALE_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
@@ -88,7 +88,7 @@ stage ('pgbench_scale_test') {
                         currentBuild.result = "FAILURE"
                         sh "exit 1"
                         }
-                       // println "PGBENCH_SCALE_TEST build ${nodevertical_build.getNumber()} completed successfully"
+                        println "PGBENCH_SCALE_TEST build ${pgbench_build.getNumber()} completed successfully"
                 }
         }
 }
