@@ -59,10 +59,10 @@ stage ('pgbench_scale_test') {
 
                         // Runing pgbench stress test
                         // PGBENCH_SCALE_TEST is actually name of jenkins job - it must be configured in advance 
+			// [$class: 'LabelParameterValue', name: 'node', label: node_label ], 
                         try {
                            pgbench_build = build job: 'PGBENCH_SCALE_TEST',
                                 parameters: [    
-						[$class: 'LabelParameterValue', name: 'node', label: node_label ],
                                                 [$class: 'StringParameterValue', name: 'NAMESPACE', value: namespace ],
                                                 [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: transactions ],
                                                 [$class: 'StringParameterValue', name: 'TEMPLATE', value: template ],
