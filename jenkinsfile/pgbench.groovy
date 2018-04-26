@@ -26,8 +26,8 @@ stage ('pgbench_scale_test') {
                         def NAMESPACE = pgbench_scale_test_properties['NAMESPACE']
                         def TRANSACTIONS = pgbench_scale_test_properties['TRANSACTIONS']
                         def TEMPLATE = pgbench_scale_test_properties['TEMPLATE']
-			def VGSIZE = pgbench_scale_test_properties['VGSIZE']
-			def MEMSIZE = pgbench_scale_test_properties['MEMSIZE']
+			def VOLUME_CAPACITY = pgbench_scale_test_properties['VOLUME_CAPACITY']
+			def MEMORY_LIMIT = pgbench_scale_test_properties['MEMORY_LIMIT']
 			def ITERATIONS = pgbench_scale_test_properties['ITERATIONS']
 			def MODE = pgbench_scale_test_properties['MODE']
 			def CLIENTS = pgbench_scale_test_properties['CLIENTS']
@@ -45,8 +45,8 @@ stage ('pgbench_scale_test') {
                         println "NAMESPACE: '${NAMESPACE}'"
                         println "TRANSACTIONS: '${TRANSACTIONS}'"
                         println "TEMPLATE: '${TEMPLATE}'"
-			println "VGSIZE: '${VGSIZE}'"
-			println "MEMSIZE: '${MEMSIZE}'"
+			println "VOLUME_CAPACITY: '${VOLUME_CAPACITY}'"
+			println "MEMORY_LIMIT: '${MEMORY_LIMIT}'"
 			println "ITERATIONS: '${ITERATIONS}'"
 			println "MODE: '${MODE}'"
 			println "CLIENTS: '${CLIENTS}'"
@@ -68,8 +68,8 @@ stage ('pgbench_scale_test') {
                                                 [$class: 'StringParameterValue', name: 'NAMESPACE', value: NAMESPACE ],
                                                 [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: TRANSACTIONS ],
                                                 [$class: 'StringParameterValue', name: 'TEMPLATE', value: TEMPLATE ],
-                                                [$class: 'StringParameterValue', name: 'VGSIZE',value: VGSIZE ],
-                                                [$class: 'StringParameterValue', name: 'MEMSIZE', value: MEMSIZE ], 
+                                                [$class: 'StringParameterValue', name: 'VOLUME_CAPACITY',value: VOLUME_CAPACITY ],
+                                                [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ], 
                                                 [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
                                                 [$class: 'StringParameterValue', name: 'MODE', value: MODE ],
                                                 [$class: 'StringParameterValue', name: 'CLIENTS', value: CLIENTS ],
