@@ -12,7 +12,7 @@ if [ $? -ne 0 ]; then
     printf "\tThe following options are available:\n\n"
     printf -- "\t\t-n --namespace - name for new namespace to create pod inside\n"
     printf -- "\t\t-t --transactions - the number pgbench transactions\n"
-    printf -- "\t\t   --scaling - pgbench scaling factor"
+    printf -- "\t\t   --scaling - pgbench scaling factor\n"
     printf -- "\t\t-e --template -  what template to use\n"
     printf -- "\t\t-v --volsize - size of volume for database\n"
     printf -- "\t\t-m --memsize - size of memory to assign to postgresql pod\n"
@@ -128,28 +128,28 @@ done
 function create_pod {
         oc new-project $namespace 
         oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize}Gi -p STORAGE_CLASS=${storageclass}
-        while [ "$(oc get pods | grep -v deploy | awk '{print $3}' | grep -v STATUS)" != "Running" ] ; do 
+        while [ "$(oc get pods -n $namespace | grep -v deploy | awk '{print $3}' | grep -v STATUS)" != "Running" ] ; do 
 	        sleep 5
         done 
         sleep 30 
 } 
 
 function run_test { 
-        POD=$(oc get pods | grep postgresql | grep -v deploy | awk '{print $1}')
+        POD=$(oc get pods -n $namespace | grep postgresql | grep -v deploy | awk '{print $1}')
 
         printf "Running test preparation\n"
-        oc exec -i $POD -- bash -c "pgbench -i -s $scaling sampledb"
+        oc exec -n $namespace -i $POD -- bash -c "pgbench -i -s $scaling sampledb"
 
     # run x itterations of test 
         for m in $(seq 1 $iterations); do
             if [ -n "$resultdir" ]; then
-                oc exec -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" >> $resultdir/pgbench_run_$m.txt 
+                oc exec -n $namespace -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" >> $resultdir/pgbench_run_$m.txt 
 	            grep "excluding connections establishing" $resultdir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $resultdir/excluding_connection_establishing.txt 
 	            grep "including connections establishing" $resultdir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $resultdir/including_connections_establishing.txt 
                 # if pbench-user-benchmark is used, then $benchmark_run_dir variable will be present and results will 
                 # be sent to it 
             elif [ ! -z "$benchmark_run_dir" ]; then 
-                oc exec -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" >> $benchmark_run_dir/pgbench_run_$m.txt
+                oc exec -n $namespace -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" >> $benchmark_run_dir/pgbench_run_$m.txt
 	            grep "excluding connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $benchmark_run_dir/excluding_connection_establishing.txt 
 	            grep "including connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $benchmark_run_dir/including_connections_establishing.txt 
             fi 
