@@ -135,7 +135,7 @@ function create_pod {
 } 
 
 function run_test { 
-        POD=$(oc get pods -n $namespace | grep postgresql | grep -v deploy | awk '{print $1}')
+        POD=$(oc get -n $namespace pods | grep postgresql | grep -v deploy | awk '{print $1}')
 
         printf "Running test preparation\n"
         oc exec -n $namespace -i $POD -- bash -c "pgbench -i -s $scaling sampledb"
@@ -166,11 +166,13 @@ function volume_setup {
     # todo : get some better way to specify these gluster volume parameters 
     
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.stat-prefetch off
-    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.write-behind on
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.write-behind off 
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.open-behind off 
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.quick-read off 
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.strict-o-direct on 
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.read-ahead off 
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.io-cache off 
-    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.readdir-ahead  off
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume set $GLUSTERVOLUME performance.readdir-ahead off
    
     # add more options here - make it parameters 
 }
