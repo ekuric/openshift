@@ -191,14 +191,12 @@ case $mode in
         create_pod
         run_test 	
         delete_project
-	pbench-move-results
     ;;
     cnsfile)
         create_pod
         volume_setup
         run_test
         delete_project
-	pbench-move-results
     ;;
     otherstorage)
         create_pod
