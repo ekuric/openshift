@@ -61,7 +61,7 @@ while true; do
         -m|--memsize)
             shift;
             if [ -n "$1" ]; then 
-                memsize="$1"
+                memsize="$1"Mi
                 shift;
             fi
         ;;
@@ -127,7 +127,13 @@ done
 
 function create_pod {
         oc new-project $namespace 
-        oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize}Gi -p STORAGE_CLASS=${storageclass}
+
+	if [ -z $memsize ] ; then
+		oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p STORAGE_CLASS=${storageclass}
+	else
+		oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize} -p STORAGE_CLASS=${storageclass}
+	fi 
+
         while [ "$(oc get pods -n $namespace | grep -v deploy | awk '{print $3}' | grep -v STATUS)" != "Running" ] ; do 
 	        sleep 5
         done 
