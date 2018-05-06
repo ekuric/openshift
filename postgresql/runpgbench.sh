@@ -1,16 +1,16 @@
 #!/bin/bash 
 
-NAMESPACE="$1"
-TRANSACTIONS="$2"
-TEMPLATE="$3"
-VOLUME_CAPACITY="$4"
-MEMORY_LIMIT="$5"
-ITERATIONS="$6"
-MODE="$7"
-CLIENTS="$8"
-THREADS="$9"
-SCALING="$10"
-STORAGECLASS="$11"
+NAMESPACE="${1}"
+TRANSACTIONS="${2}"
+TEMPLATE="${3}"
+VOLUME_CAPACITY="${4}"
+MEMORY_LIMIT="${5}"
+ITERATIONS="${6}"
+MODE="${7}"
+CLIENTS="${8}"
+THREADS="${9}"
+SCALING="${10}"
+STORAGECLASS="${11}"
 
 for memory_limit in $(echo ${MEMORY_LIMIT} | sed -e s/,/" "/g); do
 	for transactions in $(echo ${TRANSACTIONS} | sed -e s/,/" "/g); do
