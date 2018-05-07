@@ -11,6 +11,7 @@ CLIENTS="${8}"
 THREADS="${9}"
 SCALING="${10}"
 STORAGECLASS="${11}"
+PBENCHCONFIG="${12}"
 
 for memory_limit in $(echo ${MEMORY_LIMIT} | sed -e s/,/" "/g); do
 	for transactions in $(echo ${TRANSACTIONS} | sed -e s/,/" "/g); do
