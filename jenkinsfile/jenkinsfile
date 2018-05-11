@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 def pgbench_test = PGBENCH_TEST.toString().toUpperCase() 
-def pgbech_test_cns_block = PGBENCH_TEST_CNS_BLOCK.toString().toUpperCase() 
+def pgbench_test_cns_block = PGBENCH_TEST_CNS_BLOCK.toString().toUpperCase() 
 
 node {
     // clear workspace
