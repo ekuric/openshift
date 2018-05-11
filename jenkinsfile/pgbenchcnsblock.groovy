@@ -20,7 +20,7 @@ stage ('pgbench_scale_test_cns_block') {
                         // for now just keep it as is --
 
                         // sh "wget https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/pgbench.properties"
-                        sh "wget ${PGBENCH_PROPERTY_FILE_CNS_BLOCK}"
+                        sh "wget -O pgbench_cns_block.properties ${PGBENCH_PROPERTY_FILE_CNS_BLOCK}"
                         sh "cat pgbench_cns_block.properties"
 			def pgbench_scale_test_properties = readProperties file: "pgbench_cns_block.properties"
                         def NAMESPACE = pgbench_scale_test_properties['NAMESPACE']
