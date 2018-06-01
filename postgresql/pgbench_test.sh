@@ -156,8 +156,8 @@ function run_test {
                 # be sent to it 
             elif [ ! -z "$benchmark_run_dir" ]; then 
                 oc exec -n $namespace -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee $benchmark_run_dir/pgbench_run_$m.txt
-		grep "excluding connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $benchmark_run_dir/excluding_connection_establishing.txt
-		grep "including connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $benchmark_run_dir/including_connections_establishing.txt 
+                grep "excluding connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2  >> $benchmark_run_dir/excluding_connection_establishing.txt
+                grep "including connections establishing" $benchmark_run_dir/pgbench_run_$m.txt | cut -d'=' -f2 |cut -d' ' -f2 >> $benchmark_run_dir/including_connections_establishing.txt 
             fi 
 
         done 
@@ -200,7 +200,7 @@ case $mode in
     ;;
     cnsfile)
         create_pod
-        volume_setup
+        #volume_setup
         run_test
         delete_project
     ;;
