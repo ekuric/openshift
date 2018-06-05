@@ -34,14 +34,14 @@ For any specific pgbench parameter - refer to [pgbench man page](https://www.sys
 pgbench_test.sh exepects below to be in place and functioning before executing it
 
 - when executed as standalone script pgbench_test.sh does not require any prerequest 
-For this test case, check below hot to run it
+
+For standalone test case, check below how to run it
 
 - when used as input script for [pbench](https://github.com/distributed-system-analysis/pbench) pbench-user-benchmark script
 
 For pbench test case, it is necessary to have below in order to make it work 
 
 - installed and properly setup pbench from [pbench](https://github.com/distributed-system-analysis/pbench)
-- installed pgbench ( on centos/rhel it is part of `postgresql-contrib package`)
 - template which supports dynamic storage provision using storage classes
 
 ### Usage:  
@@ -70,6 +70,7 @@ It is also possible to run multiple iterations for number of **pgbench** threads
 ``` 
 
 Once test is finished, it will write results in **resultdirectory** where is possible to find **csv** file with results and **png** file which draw them all using [drawresults.py](https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/drawresults.py)
+This file can be used as input for other approaches to draw results 
 
 **.csv** file will be like 
 ``` Thread-10,Thread-20,Thread-30,Thread-40
@@ -85,21 +86,27 @@ Once test is finished, it will write results in **resultdirectory** where is pos
 827.993465,1177.664879,896.483900,698.873556
 ``` 
 
-after drawing it results will be:
+However, results will be drawed automatically and **resultdirectory** there will be **.png** file showing results - example for an test run is shown below 
 ![pgbench results](https://github.com/ekuric/openshift/blob/master/postgresql/pgbench_results_storageclass_glusterfs-storage-block_clients_10_transactions_100_scaling_100.png) 
 
-- as input script for pbench-user-benchmark 
 
+
+- Second way of running **pgbench_test.sh** is as input script for pbench-user-benchmark 
+
+In this case we can run as shown below - this mode requires installed [pbench](https://github.com/distributed-system-analysis/pbench)
 ```
 # pbench-user-benchmark --config="config_name" -- ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir --clients <number of clients> -- threads <number of threads> --storageclass <name of storageclass> 
 ``` 
 
-Where ```mode``` can be either ```cnsblock```, ```cnsfile```, or ```otherstorage```  
+Another important switch is **mode**, and ```mode``` can be either ```cnsblock```, ```cnsfile```, or ```otherstorage```  
 
 
-- for `cnsblock` case template needs to be configured to use storageclass based on cns block 
-- for `cnsfile` case template requirement for template is to use storageclass based on cns file 
+- for `cnsblock` case PVC will be carved using cns block storage class  
+- for `cnsfile` case  PVC will be carved using cns file storage class 
 - as it can be clear from name, ```otherstorage``` means any other storage configured in storage class section inside template used for postgresql 
+
+**Important:** storageclass and template supporting storageclasses must be configured and exist prior running this test
+
 
 Example how to edit PVClaim section in template is showed below 
 
@@ -132,6 +139,8 @@ Example usage with pbench-user-benchmark
 ``` 
 # pbench-user-benchmark --config="test_postgresql" -- ./pgbench_test.sh -n pgblock -t 100 -e glusterblock-postgresql-persistent -v 20 -m 2 -i 5 --mode cnsblock --threads 2 --clients 10 --storageclass glusterfs-storage 
 ``` 
+
+
 
 ### Todo 
 
