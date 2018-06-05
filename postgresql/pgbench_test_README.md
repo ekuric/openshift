@@ -14,7 +14,7 @@ The following options are available:
 
 		-n --namespace - name for new namespace to create pod inside
 		-t --transactions - the number pgbench transactions
-		   --scaling - pgbench scaling factor
+		 --scaling - pgbench scaling factor
 		-e --template -  what template to use
 		-v --volsize - size of volume for database
 		-m --memsize - size of memory to assign to postgresql pod
@@ -26,6 +26,8 @@ The following options are available:
 		 --storageclass - name of storageclass to use to allocate storage
 
 ``` 
+
+For any specific pgbench parameter - refer to [pgbench man page](https://www.systutorials.com/docs/linux/man/1-pgbench/)
 
 ### Setup
 
@@ -49,11 +51,49 @@ For pbench test case, it is necessary to have below in order to make it work
 ```
 ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir --clients <number of clients> -- threads <number of threads> --storageclass <name of storageclass>
 ```
+
+**Important**
+
+**vgsize** will be in **Gi**, eg, specifying **-v 2** will allocate 2Gi for PVC 
+**memsize** is in **Mi**, eg, specifying **-m 2048** will allocated 2Gi for memory limits for pod
+**resultdir** will be creted in **$PWD** 
+
+Exmple usage for this case is 
+
+```
+./pgbench_test.sh -n mytest -t 100 -e cns-postgresql-persistent -v 10 -m 2048 -i 2 --clients 10 --threads 10 --storageclass glusterfs-storage-block --mode cnsblock  --scaling 100 -r resultsdirectory 
+``` 
+It is also possible to run multiple iterations for number of **pgbench** threads, example usage for this case per below 
+
+```
+./pgbench_test.sh -n mytest -t 100 -e cns-postgresql-persistent -v 10 -m 2048 -i 2 --clients 10 --threads 10,20,30,40 --storageclass glusterfs-storage-block --mode cnsblock  --scaling 100 -r resultsdirectory 
+``` 
+
+Once test is finished, it will write results in **resultdirectory** where is possible to find **csv** file with results and **png** file which draw them all using [drawresults.py](https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/drawresults.py)
+
+**.csv** file will be like 
+``` Thread-10,Thread-20,Thread-30,Thread-40
+779.783033,845.761088,863.825659,1277.917710
+798.060394,822.748672,855.191311,902.224977
+804.976040,1163.257353,1184.700774,1246.657400
+811.224755,842.565748,884.425879,561.481683
+832.003514,839.403621,871.196248,570.666161
+816.856654,855.852964,1232.100658,583.815808
+813.316926,42.022967,896.805489,580.899895
+827.575477,839.521305,891.568349,578.824292
+1116.512551,859.840792,1235.193122,574.642960
+827.993465,1177.664879,896.483900,698.873556
+``` 
+
+after drawing it results will be:
+![pgbench results](https://github.com/ekuric/openshift/blob/master/postgresql/pgbench_results_storageclass_glusterfs-storage-block_clients_10_transactions_100_scaling_100.png) 
+
 - as input script for pbench-user-benchmark 
 
 ```
 # pbench-user-benchmark --config="config_name" -- ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir --clients <number of clients> -- threads <number of threads> --storageclass <name of storageclass> 
 ``` 
+
 Where ```mode``` can be either ```cnsblock```, ```cnsfile```, or ```otherstorage```  
 
 
