@@ -86,7 +86,7 @@ This file can be used as input for other approaches to draw results
 827.993465,1177.664879,896.483900,698.873556
 ``` 
 
-However, results will be drawed automatically and **resultdirectory** there will be **.png** file showing results - example for an test run is shown below 
+However, results will be drawed automatically in the **resultdirectory** there will be **.png** file showing results - example for an test run is shown below 
 ![pgbench results](https://github.com/ekuric/openshift/blob/master/postgresql/pgbench_results_storageclass_glusterfs-storage-block_clients_10_transactions_100_scaling_100.png) 
 
 
@@ -94,21 +94,26 @@ However, results will be drawed automatically and **resultdirectory** there will
 - Second way of running **pgbench_test.sh** is as input script for pbench-user-benchmark 
 
 In this case we can run as shown below - this mode requires installed [pbench](https://github.com/distributed-system-analysis/pbench)
+
 ```
 # pbench-user-benchmark --config="config_name" -- ./pgbench_test.sh -n <namespace> -t <transactions> -e <template> -v <vgsize> -m <memsize> -i <iterations> --mode <mode> -r resultdir --clients <number of clients> -- threads <number of threads> --storageclass <name of storageclass> 
 ``` 
 
-Another important switch is **mode**, and ```mode``` can be either ```cnsblock```, ```cnsfile```, or ```otherstorage```  
+Once test if finished results will be stored in **/var/lib/pbench-agent/**
+
+Another important switch to mention is **mode**, and with ```mode``` we define what storage backend to use.
+It can be either ```cnsblock```, ```cnsfile```, or ```otherstorage```  
 
 
 - for `cnsblock` case PVC will be carved using cns block storage class  
 - for `cnsfile` case  PVC will be carved using cns file storage class 
 - as it can be clear from name, ```otherstorage``` means any other storage configured in storage class section inside template used for postgresql 
 
-**Important:** storageclass and template supporting storageclasses must be configured and exist prior running this test
+**Important:** storageclass and template supporting storageclasses must be configured and exist prior running this test. Current state of 
+OCP template examples does not have support for dynamic storage provision and it is necessary to edit template to add support 
+for dynamic storage provision. Below is example of changes in **postgresql-persistent** template 
 
-
-Example how to edit PVClaim section in template is showed below 
+Example how to edit PVClaim section in postgresql-persistent template is showed below 
 
 ``` 
         ...
@@ -129,7 +134,7 @@ add also in ```parameters``` section
 	   "displayName": "Storage class name",
 	   "name": "STORAGE_CLASS",
 	   "required": true, 
-           "value": "glusterfs-storage-block" 
+       "value": "glusterfs-storage-block" 
 	}
 ``` 
 
@@ -144,4 +149,4 @@ Example usage with pbench-user-benchmark
 
 ### Todo 
 
-Get support for ```kubectl``` client to be k8s compatible (PR welcome)
+Get support for ```kubectl``` client to be k8s compatible (PR welcome) - thought this is not hight priority ;) 
