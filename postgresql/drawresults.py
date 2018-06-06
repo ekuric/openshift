@@ -23,7 +23,7 @@ try:
 except ImportError:
     print("modules not installed...getting them")
     print("Trying to install necessary modules")
-    subprocess.call(['rpm', '-ihv', 'http://ftp.riken.jp/Linux/fedora/epel/7/x86_64/e/epel-release-7-5.noarch.rpm'])
+    subprocess.call(['rpm', '-ihv', 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'])
     subprocess.call(['yum', 'install', '-y', 'gcc', 'gcc-c++', 'libgcc', 'python-pip', 'python-devel', 'numpy',
                      'python-matplotlib'])
     subprocess.call(['pip', 'install', 'pandas'])
