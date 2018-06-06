@@ -9,6 +9,8 @@
 # prepare environment and import modules
 # try to import pandas and matplotlib, in most cases these modules are not installed by default
 
+import subprocess 
+
 try:
     import matplotlib as mpl
 
@@ -17,7 +19,6 @@ try:
     import matplotlib.pyplot as plt
     import pandas as pd
     import numpy as np
-    import subprocess
 
 except ImportError:
     print("modules not installed...getting them")
