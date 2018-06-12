@@ -1,0 +1,22 @@
+{
+  "kind": "PersistentVolumeClaim",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "testpvc",
+    "annotations": {
+      "volume.beta.kubernetes.io/storage-class": "glusterfs-storage-block"
+
+    }
+  },
+  "spec": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "resources": {
+      "requests": {
+        "storage": "1G"
+      }
+    }
+  }
+}
+
