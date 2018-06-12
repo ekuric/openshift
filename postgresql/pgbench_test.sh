@@ -201,6 +201,7 @@ function profile_setup {
 
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume start 
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info clear 
+
 }
 
 function collect_profile {
@@ -209,7 +210,8 @@ function collect_profile {
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
 
-    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info >> $benchmark_run_dir/gluster_volume_$block_volume_data.txt 
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info >> $benchmark_run_dir/gluster_volume_${block_volume}.txt 
+    oc exec -n $CNSPOJECT $CNSPOD -- rpm -qa | grep gluster > $benchmark_run_dir/gluster_packages_installed.txt 
 }
 
 function volume_setup {
