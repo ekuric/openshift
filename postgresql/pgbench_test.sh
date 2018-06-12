@@ -194,7 +194,6 @@ function draw_result {
 
 function profile_setup {
 
-    oc create -n ${namespace} -f https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/pvc.json
     block_volume=$(heketi-cli -s http://heketi-storage-cnscluster.router.default.svc.cluster.local --user admin --secret $(oc get secret -n cnscluster heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode)  volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
