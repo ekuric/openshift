@@ -211,6 +211,7 @@ function collect_profile {
 
     oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info >> $benchmark_run_dir/gluster_volume_${block_volume}.txt 
     oc exec -n $CNSPOJECT $CNSPOD -- rpm -qa | grep gluster > $benchmark_run_dir/gluster_packages_installed.txt 
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume info $block_volume > $benchmark_run_dir/gluster_volume_info.txt
 }
 
 function volume_setup {
