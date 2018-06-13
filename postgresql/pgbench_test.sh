@@ -201,7 +201,8 @@ function draw_result {
 # function to setup profile 
 
 function profile_setup {
-    local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) --user admin --secret $(oc get secret -n cnscluster heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode)  volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
+    local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) \
+	    --user admin --secret $(oc get secret -n $(oc get pods --all-namespaces | grep glusterfs-storage | awk '{print $1}'| head -1)  heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode) volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
 
@@ -211,8 +212,9 @@ function profile_setup {
 }
 
 function collect_profile {
-   
-    local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) --user admin --secret $(oc get secret -n cnscluster heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode)  volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
+
+    local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) \
+            --user admin --secret $(oc get secret -n $(oc get pods --all-namespaces | grep glusterfs-storage | awk '{print $1}'| head -1)  heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode) volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
 
