@@ -201,8 +201,7 @@ function draw_result {
 # function to setup profile 
 
 function profile_setup {
-
-    block_volume=$(heketi-cli -s http://heketi-storage-cnscluster.router.default.svc.cluster.local --user admin --secret $(oc get secret -n cnscluster heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode)  volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
+    local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) --user admin --secret $(oc get secret -n cnscluster heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode)  volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
 
@@ -212,14 +211,21 @@ function profile_setup {
 }
 
 function collect_profile {
-
-    block_volume=$(heketi-cli -s http://heketi-storage-cnscluster.router.default.svc.cluster.local --user admin --secret $(oc get secret -n cnscluster heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode)  volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
+   
+    local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) --user admin --secret $(oc get secret -n cnscluster heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode)  volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
 
-    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info >> $benchmark_run_dir/gluster_volume_${block_volume}.txt 
-    oc exec -n $CNSPOJECT $CNSPOD -- rpm -qa | grep gluster > $benchmark_run_dir/gluster_packages_installed.txt 
-    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume info $block_volume > $benchmark_run_dir/gluster_volume_info.txt
+    if [ -n "$resultdir" ] ; then
+        oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info > $resultdir/gluster_volume_${block_volume}.txt
+        oc exec -n $CNSPOJECT $CNSPOD -- rpm -qa  > $resultdir/gluster_packages_installed.txt
+        oc exec -n $CNSPOJECT $CNSPOD -- gluster volume info $block_volume > $resultdir/gluster_volume_info.txt
+
+    elif [ ! -z "$benchmark_run_dir" ]; then
+        oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info >> $benchmark_run_dir/gluster_volume_${block_volume}.txt
+        oc exec -n $CNSPOJECT $CNSPOD -- rpm -qa  > $benchmark_run_dir/gluster_packages_installed.txt
+        oc exec -n $CNSPOJECT $CNSPOD -- gluster volume info $block_volume > $benchmark_run_dir/gluster_volume_info.txt
+    fi 
 }
 
 function volume_setup {
@@ -252,7 +258,7 @@ function delete_project {
 # necessary to polish this ... 
 case $mode in
     cnsblock)
-	delete_project 
+        delete_project
         create_pod
         profile_setup 
         run_test 	
