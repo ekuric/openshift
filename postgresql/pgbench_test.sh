@@ -2,7 +2,7 @@
 
 # Script to to run pgbench load test against postgresql pod in kubernetes/Openshift
   
-opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:,clients:,scaling:,threads:,storageclass:" -n "getopt.sh" -- "$@");
+opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "draw:,namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:,clients:,scaling:,threads:,storageclass:" -n "getopt.sh" -- "$@");
 
 if [ $? -ne 0 ]; then
     printf -- "$*\n"
@@ -21,6 +21,7 @@ if [ $? -ne 0 ]; then
     printf -- "\t\t --clients - number of pgbench clients\n"
     printf -- "\t\t --threads - number of pgbench threads\n"
     printf -- "\t\t --storageclass - name of storageclass to use to allocate storage\n"
+    printf -- "\t\t --draw - wheather or not to draw results"
     exit 1 
 fi
 
@@ -114,6 +115,13 @@ while true; do
                 shift;
             fi 
         ;; 
+        --draw)
+            shift;
+            if [ -n "$1" ]; then 
+                draw="$1"
+                shift; 
+            fi
+        ;;
         --)
             break;
         ;;
@@ -238,29 +246,29 @@ function delete_project {
     oc delete pods -n $namespace --all 
     oc delete pvc -n $namespace --all 
     oc delete project $namespace
-    sleep 30
+    sleep 180
 }
 
 # necessary to polish this ... 
 case $mode in
     cnsblock)
+	delete_project 
         create_pod
         profile_setup 
         run_test 	
         collect_profile
     	draw_result
-        delete_project
     ;;
     cnsfile)
+	delete_project 
         create_pod
         volume_setup
         run_test
         draw_result 
-        delete_project
     ;;
     otherstorage)
+	delete_project
         create_pod
         run_test
         draw_result 
-        delete_project
 esac 
