@@ -260,23 +260,23 @@ function delete_project {
 # necessary to polish this ... 
 case $mode in
     cnsblock)
-        delete_project
         create_pod
         profile_setup 
         run_test 	
         collect_profile
-    	draw_result
+    	#draw_result
+	delete_project 
     ;;
     cnsfile)
-	delete_project 
         create_pod
         volume_setup
         run_test
-        draw_result 
+        #draw_result 
+	delete_project
     ;;
     otherstorage)
 	delete_project
         create_pod
         run_test
-        draw_result 
+        #draw_result 
 esac 
