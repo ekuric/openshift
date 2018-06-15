@@ -182,7 +182,7 @@ function draw_result {
 		paste -d',' ${resultdir}/results_thread_*  >> ${resultdir}/results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling}.csv
 		curl -o ${resultdir}/drawresults.py https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/drawresults.py
 
-		python ${resultdir}/drawresults.py -r ${resultdir}/results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling}.csv -i ff -o ${resultdir}/pgbench_results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling} -t "Clients:${clients} - Transactions:${transactions} - Scaling:${scaling}" -p bars -x "Test iteration" -y "Transactions/Second (tps/sec)" --series=${iterations}
+		#python ${resultdir}/drawresults.py -r ${resultdir}/results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling}.csv -i ff -o ${resultdir}/pgbench_results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling} -t "Clients:${clients} - Transactions:${transactions} - Scaling:${scaling}" -p bars -x "Test iteration" -y "Transactions/Second (tps/sec)" --series=${iterations}
 
 	elif [ ! -z "$benchmark_run_dir" ] ; then 
 		for thread in $(echo ${threads} | sed -e s/,/" "/g); do
@@ -193,7 +193,7 @@ function draw_result {
 		paste -d',' $benchmark_run_dir/results_thread_*  >> $benchmark_run_dir/results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling}.csv
                 curl -o $benchmark_run_dir/drawresults.py https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/drawresults.py
 
-		python $benchmark_run_dir/drawresults.py -r $benchmark_run_dir/results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling}.csv -i ff -o $benchmark_run_dir/pgbench_results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling} -t "Clients:${clients} - Transactions:${transactions} - Scaling:${scaling}" -p bars -x "Test iteration" -y "Transactions/Second (tps/sec)" --series=${iterations}
+		#python $benchmark_run_dir/drawresults.py -r $benchmark_run_dir/results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling}.csv -i ff -o $benchmark_run_dir/pgbench_results_storageclass_${storageclass}_clients_${clients}_transactions_${transactions}_scaling_${scaling} -t "Clients:${clients} - Transactions:${transactions} - Scaling:${scaling}" -p bars -x "Test iteration" -y "Transactions/Second (tps/sec)" --series=${iterations}
 	fi 
 
 }
@@ -264,14 +264,14 @@ case $mode in
         profile_setup 
         run_test 	
         collect_profile
-    	#draw_result
+    	draw_result
 	delete_project 
     ;;
     cnsfile)
         create_pod
         volume_setup
         run_test
-        #draw_result 
+        draw_result 
 	delete_project
     ;;
     otherstorage)
