@@ -146,6 +146,7 @@ function run_test {
         POD=$(oc get pods | grep postgresql | grep -v deploy | awk '{print $1}')
         printf "Running test preparation\n"
         oc exec -i $POD -- bash -c "pgbench -i -s $scaling sampledb"
+	sleep 120 
 
     # run x itterations of test 
 	for thread in $(echo ${threads} | sed -e s/,/" "/g); do
@@ -153,6 +154,8 @@ function run_test {
             		if [ -n "$resultdir" ]; then
                 		oc exec -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $resultdir/threads_${thread}_pgbench_run.txt 
             		elif [ ! -z "$benchmark_run_dir" ]; then 
+				echo "sleeping 120s..."
+				sleep 120
                 		oc exec -i $POD -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $benchmark_run_dir/threads_${thread}_pgbench_run.txt
             		fi 
 		done
