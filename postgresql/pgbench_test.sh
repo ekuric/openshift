@@ -145,8 +145,10 @@ function create_pod {
 function run_test { 
         POD=$(oc get pods -n $namespace | grep postgresql | grep -v deploy | awk '{print $1}')
         printf "Running test preparation\n"
-        oc exec -i $POD -n $namespace -- bash -c "pgbench -i -s $scaling sampledb"
 	sleep 120 
+	# 
+	# oc exec <pod>  -- /bin/sh -i -c pg_isready -h 127.0.0.1 -p 5432 
+        oc exec -i $POD -n $namespace -- bash -c "pgbench -i -s $scaling sampledb"
 
     # run x itterations of test 
 	for thread in $(echo ${threads} | sed -e s/,/" "/g); do
