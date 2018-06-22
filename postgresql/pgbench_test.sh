@@ -132,7 +132,6 @@ while true; do
     esac 
 done 
 
-echo $threads
 function create_pod {
         oc new-project $namespace 
         oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize} -p STORAGE_CLASS=${storageclass}
@@ -145,7 +144,7 @@ function create_pod {
 function run_test { 
         POD=$(oc get pods -n $namespace | grep postgresql | grep -v deploy | awk '{print $1}')
         printf "Running test preparation\n"
-	sleep 120 
+	    sleep 120 
 	# 
 	# oc exec <pod>  -- /bin/sh -i -c pg_isready -h 127.0.0.1 -p 5432 
         oc exec -i $POD -n $namespace -- bash -c "pgbench -i -s $scaling sampledb"
@@ -154,9 +153,9 @@ function run_test {
 	for thread in $(echo ${threads} | sed -e s/,/" "/g); do
 		for m in $(seq 1 $iterations); do
             		if [ -n "$resultdir" ]; then
-                		oc exec -i $POD -n $namespace -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $resultdir/threads_${thread}_pgbench_run.txt 
+                		oc exec -i $POD -n $namespace -- bash -c "pgbench -d -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $resultdir/threads_${thread}_pgbench_run.txt 
             		elif [ ! -z "$benchmark_run_dir" ]; then 
-                		oc exec -i $POD -n $namespace -- bash -c "pgbench -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $benchmark_run_dir/threads_${thread}_pgbench_run.txt
+                		oc exec -i $POD -n $namespace -- bash -c "pgbench -d -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $benchmark_run_dir/threads_${thread}_pgbench_run.txt
             		fi 
 		done
 	done 
