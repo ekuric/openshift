@@ -153,9 +153,9 @@ function run_test {
 	for thread in $(echo ${threads} | sed -e s/,/" "/g); do
 		for m in $(seq 1 $iterations); do
             		if [ -n "$resultdir" ]; then
-                		oc exec -i $POD -n $namespace -- bash -c "pgbench -d -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $resultdir/threads_${thread}_pgbench_run.txt 
+                		oc exec -i $POD -n $namespace -- bash -c "pgbench -n -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $resultdir/threads_${thread}_pgbench_run.txt 
             		elif [ ! -z "$benchmark_run_dir" ]; then 
-                		oc exec -i $POD -n $namespace -- bash -c "pgbench -d -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $benchmark_run_dir/threads_${thread}_pgbench_run.txt
+                		oc exec -i $POD -n $namespace -- bash -c "pgbench -n -c $clients -j $threads -t $transactions sampledb" 2>&1 | tee -a $benchmark_run_dir/threads_${thread}_pgbench_run.txt
             		fi 
 		done
 	done 
