@@ -265,7 +265,7 @@ case $mode in
         create_pod
         profile_setup 
         run_test 	
-        collect_profile
+        #collect_profile
     	draw_result
 	delete_project 
     ;;
