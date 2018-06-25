@@ -263,7 +263,7 @@ function delete_project {
 case $mode in
     cnsblock)
         create_pod
-        profile_setup 
+        #profile_setup 
         run_test 	
         #collect_profile
     	draw_result
