@@ -48,6 +48,7 @@ To build docker image follow steps below
 
 ```
 $ mkdir dockerbuild 
+$ cd dockerbuild
 $ cp /home/elvir/.ssh/fiokey .
 ```  
 
