@@ -1,0 +1,235 @@
+=== Purpose 
+
+Short description how to run fio inside pods on OCP using *pbench-fio*
+
+Assumptions:
+
+- Installed and functional OCP cluster 
+- Installed CNS cluster and working *storageclasses*
+- properly installed pbench and pbench tools registered 
+
+if any of above is not set up properly - go and fix them! 
+
+
+Once above is functional and in place we can proceed 
+
+1. Create an ssh key - without password protection 
+
+``` 
+ssh-keygen 
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/elvir/.ssh/id_rsa): /home/elvir/.ssh/fiokey
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/elvir/.ssh/fiokey.
+Your public key has been saved in /home/elvir/.ssh/fiokey.pub.
+The key fingerprint is:
+SHA256:nVUQvctA3p7EPlMsm78e4SvuSnHl8xbAiedaf+axDBQ elvir@emakina
+The key's randomart image is:
++---[RSA 2048]----+
+|            o+.  |
+|            +.o  |
+|           +.E + |
+|         . o= @ o|
+|        S o. @ % |
+|            * & =|
+|           o . O=|
+|          .  .o+B|
+|           .+oo*o|
++----[SHA256]-----+
+
+``` 
+We need this key to be built inside fio pod
+
+
+=== Building Docker Image 
+
+To build docker image follow steps below 
+
+```
+$ mkdir dockerbuild 
+$ cp /home/elvir/.ssh/fiokey .
+```  
+
+Get Dockerfile and build image, example of Dockerfile can be found this file https://raw.githubusercontent.com/ekuric/openshift/master/dockerbuild/Dockerfile 
+
+``` 
+$ pwd
+/home/elvir/dockerbuild
+$ curl -o Dockerfile https://raw.githubusercontent.com/ekuric/openshift/master/dockerbuild/Dockerfile 
+$ docker build -t fioimage . 
+``` 
+If all is fine after couple minutes image will be build. 
+Make this image available somewhere - either docker.io registry, or some other registry from where it can be pulled when test is started 
+
+=== Create Pods 
+
+Run below on on OCP master or other machine from which is possible to create pods, get cluster-loader and use it to create pods
+
+To make your life easier, run below on openshift master
+
+```
+$ git clone https://github.com/openshift/svt.git
+$ cd svt 
+
+$  ls -l
+total 28
+drwxrwxr-x. 4 elvir elvir    39 Jul  3 16:59 application_performance
+drwxrwxr-x. 3 elvir elvir    55 Jul  3 16:59 applications_scalability
+drwxrwxr-x. 2 elvir elvir   144 Jul  3 16:59 conformance
+drwxrwxr-x. 5 elvir elvir   109 Jul  3 16:59 dockerfiles
+drwxrwxr-x. 6 elvir elvir   126 Jul  3 16:59 image_provisioner
+-rw-rw-r--. 1 elvir elvir 10759 Jul  3 16:59 LICENSE
+drwxrwxr-x. 4 elvir elvir    70 Jul  3 16:59 logging_metrics_performance
+drwxrwxr-x. 3 elvir elvir    23 Jul  3 16:59 networking
+drwxrwxr-x. 8 elvir elvir   101 Jul  3 16:59 openshift_performance
+drwxrwxr-x. 6 elvir elvir  4096 Jul  3 16:59 openshift_scalability
+drwxrwxr-x. 3 elvir elvir    53 Jul  3 16:59 openshift_templates
+drwxrwxr-x. 4 elvir elvir    45 Jul  3 16:59 openshift_tooling
+-rw-rw-r--. 1 elvir elvir  3488 Jul  3 16:59 README.md
+drwxrwxr-x. 5 elvir elvir  4096 Jul  3 16:59 reliability
+-rw-rw-r--. 1 elvir elvir   959 Jul  3 16:59 run_test_steps.md
+drwxrwxr-x. 5 elvir elvir    50 Jul  3 17:25 storage
+drwxrwxr-x. 5 elvir elvir    48 Jul  3 16:59 utils
+
+
+$ cd openshift_scalability
+$ vim content/fio/fio-parameters.yaml
+```
+in *content/fio/fio-parameters.yaml* has content as below 
+
+```
+projects:
+  - num: 1
+    basename: fiotest
+    tuning: default
+    templates:
+      - num: 3
+        file: ./content/fio/fio-template.json
+        parameters:
+          - STORAGE_CLASS: "storageclass" 
+          - STORAGE_SIZE: "3Gi" 
+          - MOUNT_PATH: "/mnt/pvcmount"
+          - DOCKER_IMAGE: "dockerimage"
+          
+
+tuningsets:
+  - name: default
+    templates:
+      stepping:
+        stepsize: 5
+        pause: 0 min
+      rate_limit:
+        delay: 0 ms
+``` 
+
+Change *PARAMETERS* section to reflect *STORAGECLASS*, *STORAGE_SIZE*, *MOUNT_PATH*, and *DOCKER_IMAGE* you want to use
+for example 
+
+```
+          - STORAGE_CLASS: "glusterfs-storage" 
+          - STORAGE_SIZE: "28Gi" 
+          - MOUNT_PATH: "/mnt/pvcmount"
+          - DOCKER_IMAGE: "docker.io/elvirkuric/efio"
+```
+Adapt these values to specific test needs 
+
+After this, execute
+
+```
+$ python cluster-loader.py -f content/fio/fio-parameters.yaml
+``` 
+once it finishes there will be created pods/pvcs 
+
+for example 
+
+```
+# oc get pods -n fiotest0 
+NAME            READY     STATUS    RESTARTS   AGE
+fio-pod-26927   1/1       Running   0          3h
+fio-pod-48l7p   1/1       Running   0          3h
+fio-pod-4gjfx   1/1       Running   0          3h
+
+
+
+# oc get pvc -n fiotest0 
+NAME            STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+pvc04y5alfd0u   Bound     pvc-809ccf10-868a-11e8-bd83-fa163e0c5569   28Gi       RWO            glusterfs-storage   3h
+pvc0okur3y31b   Bound     pvc-7ff72dcc-868a-11e8-bd83-fa163e0c5569   28Gi       RWO            glusterfs-storage   3h
+pvc16l3lmqh0l   Bound     pvc-826980e7-868a-11e8-bd83-fa163e0c5569   28Gi       RWO            glusterfs-storage   3h
+
+```
+These PVC will be mounted inside pods. You can check that with 
+
+```
+$ oc exec <pod_name> -- mount | grep pvcmount 
+``` 
+
+Collect *ip addresses of pods* 
+
+
+```
+# oc get pods -o wide -n fiotest0 | grep -v NAME | awk '{print $6 }' > clients.list
+```
+
+=== Preparation for pbench-fio test 
+
+After this point all is ready for testing, however there are additional changes 
+which needs to be implemented 
+
+1. In first step we created key `/home/elvir/.ssh/fiokey.pub` and built it inside image. Now if you issue 
+
+```
+$ ssh <pod_ip>
+``` 
+it will ask for password as it will not point to this key.
+If we issue command 
+```
+$ ssh -i /home/elvir/.ssh/fiokey <pod_ip>
+``` 
+
+it wll work as expected and we will get access inisde pod.
+
+`pbench` has variable `$ssh_opts` defined in `/opt/pbench-agent/base` as 
+
+```
+ssh_opts=$(getconf.py ssh_opts results)
+if [ -z "$ssh_opts" ]; then
+    ssh_opts='-o StrictHostKeyChecking=no'
+fi
+``` 
+Important : check pbench/pbench-fio code 
+
+in order to hack `pbench-fio` to work with our generated key, do below 
+
+- edit `pbench-fio` and replace all occurances of `ssh_opts` with `SSH_OPTS`
+- define new varialbe at top of `pbench-fio` as `SSH_OPTS="$ssh_opts -i /root/.ssh/fiokey"` 
+
+after this, `pbench-fio` will know which key to use to when accesing fio clients ( in this case pods )
+
+
+==== Running Test 
+
+Once `clients.list` is populated with ip addresses of pods, they can be from fio 
+point of view threated as any other fio clients
+
+```
+$ pbench-fio --config="fio_randrw" --sysinfo=none --test-types=randrw --block-sizes=64 --iodepth=8 --file-size=25600M --client-file=clients.list --numjobs=1   --max-stddev=20 --runtime=600 --targets=/mnt/pvcmount/f2 --pre-iteration-script=./drop-cache.sh 
+``` 
+
+This `--pre-iteration-script` script can be any script you want to run prior test starts, I decided to be simple `drop-cache.sh` to drop cache on gluster nodes prior test 
+```
+for node in cns-0.scale-ci.example.com cns-1.scale-ci.example.com cns-2.scale-ci.example.com; do
+        ssh $node "echo 3 >/proc/sys/vm/drop_caches"
+        echo "cache dropped for .....$node"
+        sleep 5
+done
+``` 
+adapt it to your wishes and needs. 
+
+=== Results 
+
+Once test is finished, results will be in `/var/lib/pbench-agent/` 
+
+
+
