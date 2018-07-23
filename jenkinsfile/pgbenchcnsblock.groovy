@@ -5,7 +5,7 @@ println "Current pipeline job build id is '${pipeline_id}'"
 def node_label = 'CCI && ansible-2.3'
 def pgbench_test_cns_block = PGBENCH_TEST_CNS_BLOCK.toString().toUpperCase()
 
-// run pgbench scale test
+// run pgbench cns block scale test
 stage ('pgbench_scale_test_cns_block') {
           if ( pgbench_test_cns_block == "TRUE") {
                 currentBuild.result = "SUCCESS"

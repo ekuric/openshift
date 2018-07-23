@@ -16,5 +16,10 @@ node {
     if ( pgbench_test_cns_block == "TRUE" ) {
 	load "openshift/jenkinsfile/pgbenchcnsblock.groovy"
     } 
-
+    if ( mongodb_ycsb_cns_block == "TRUE" ) {
+	load "openshift/jenkinsfile/mongodbycsbblock.groovy"
+    }  
+    if ( mongodb_ycsb_cns_file == "TRUE" ) {
+	load "openshift/jenkinsfile/mongodbycsbfile.groovy"
+    } 
 }
