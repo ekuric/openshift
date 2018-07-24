@@ -11,11 +11,12 @@ node {
 
     // run pgbench 
     if ( pgbench_test == "TRUE" ) {
-	load "openshift/jenkinsfile/pgbench.groovy"
+	load "openshift/jenkinsfile/ptest.groovy"
+	//pgbench.groovy"
     }
-    if ( pgbench_test_cns_block == "TRUE" ) {
-	load "openshift/jenkinsfile/pgbenchcnsblock.groovy"
-    } 
+    //if ( pgbench_test_cns_block == "TRUE" ) {
+    //	load "openshift/jenkinsfile/pgbenchcnsblock.groovy"
+    // } 
     //if ( mongodb_ycsb_cns_block == "TRUE" ) {
     // 	load "openshift/jenkinsfile/mongodbycsbblock.groovy"
     //}  
