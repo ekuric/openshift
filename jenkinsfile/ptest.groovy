@@ -98,7 +98,7 @@ stage ('pgbench_scale_test') {
 
 // run pgbench gluster-block scale test
 stage ('pgbench_scale_test_cns_block') {
-          if ( pgbench_test_cns_block == "TRUE") {
+          if ( pgbench_test == "TRUE") {
                 currentBuild.result = "SUCCESS"
 		node('CCI && US') {
                         // get properties file
