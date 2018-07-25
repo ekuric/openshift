@@ -15,11 +15,6 @@ stage ('mongoycsb_scale_test') {
                                 println "mongodbycsb.properties... deleting it..."
                                 sh "mongodbycsb.properties"
                         }
-                        // get properties file - from test location
-                        // in SCALE-CI there will be defined PGBENCH_SCALE_TEST_PROPERTY_FILE
-                        // for now just keep it as is --
-
-                        // sh "wget https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/pgbench.properties"
                         sh "wget -O mongodbycsb.properties ${MONGOYCSB_PROPERTY_FILE}"
                         sh "cat mongodbycsb.properties"
 			def mongodbycsb_scale_test_properties = readProperties file: "mongodbycsb.properties"
@@ -31,7 +26,7 @@ stage ('mongoycsb_scale_test') {
                         def RECORDCOUNT = mongodbycsb_scale_test_properties['RECORDCOUNT']
                         def OPERATIONCOUNT = mongodbycsb_scale_test_properties['OPERATIONCOUNT']
                         def STORAGECLASS = mongodbycsb_scale_test_properties['STORAGECLASS']
-			def VOLUMECAPACITY = mongodbycsb_scale_test_properties['VOLUMECAPACITY']
+			def VOLUMESIZE = mongodbycsb_scale_test_properties['VOLUMESIZE']
                         // debug info
                         println "----------USER DEFINED OPTIONS-------------------"
                         println "-------------------------------------------------"
@@ -44,24 +39,21 @@ stage ('mongoycsb_scale_test') {
                         println "RECORDCOUNT: '${RECORDCOUNT}'"
                         println "OPERATIONCOUNT: '${OPERATIONCOUNT}'"
                         println "STORAGECLASS: '${STORAGECLASS}'"
-			println "VOLUMECAPACITY:'${VOLUMECAPACITY}'"
+			println "VOLUMESIZE:'${VOLUMESIZE}'"
 
                         println "-------------------------------------------------"
                         println "-------------------------------------------------"
                         try {
-                           pgbench_build = build job: 'PGBENCH_SCALE_TEST',
-                                parameters: [   [$class: 'StringParameterValue', name: 'NAMESPACE', value: NAMESPACE ],
-                                                [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: TRANSACTIONS ],
-                                                [$class: 'StringParameterValue', name: 'TEMPLATE', value: TEMPLATE ],
-                                                [$class: 'StringParameterValue', name: 'VOLUME_CAPACITY',value: VOLUME_CAPACITY ],
-                                                [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
+                           mongodbycsb_build = build job: 'MONGODB_YCSB_TEST',
+                                parameters: [   [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
+                                                [$class: 'StringParameterValue', name: 'YCSB_THREADS', value: YCSB_THREADS ],
+                                                [$class: 'StringParameterValue', name: 'JUMP_HOST', value: JUMP_HOST ],
+                                                [$class: 'StringParameterValue', name: 'WORKLOAD',value: WORKLOAD ],
                                                 [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
-                                                [$class: 'StringParameterValue', name: 'MODE', value: MODE ],
-                                                [$class: 'StringParameterValue', name: 'CLIENTS', value: CLIENTS ],
-                                                [$class: 'StringParameterValue', name: 'THREADS', value: THREADS ],
-                                                [$class: 'StringParameterValue', name: 'SCALING', value: SCALING ],
-                                                [$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: PBENCHCONFIG ],
-                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ]]
+                                                [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
+                                                [$class: 'StringParameterValue', name: 'OPERATIONCOUNT', value: OPERATIONCOUNT ],
+                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
+                                                [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ]]
                         } catch ( Exception e) {
                         echo "PGBENCH_SCALE_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
@@ -101,7 +93,7 @@ stage ('mongoycsb_scale_test') {
                         def RECORDCOUNT = mongodbycsb_scale_test_properties['RECORDCOUNT']
                         def OPERATIONCOUNT = mongodbycsb_scale_test_properties['OPERATIONCOUNT']
                         def STORAGECLASS = mongodbycsb_scale_test_properties['STORAGECLASS']
-			def VOLUMECAPACITY = mongodbycsb_scale_test_properties['VOLUMECAPACITY']
+			def VOLUMESIZE = mongodbycsb_scale_test_properties['VOLUMESIZE']
                         // debug info
                         println "----------USER DEFINED OPTIONS-------------------"
                         println "-------------------------------------------------"
@@ -114,24 +106,21 @@ stage ('mongoycsb_scale_test') {
                         println "RECORDCOUNT: '${RECORDCOUNT}'"
                         println "OPERATIONCOUNT: '${OPERATIONCOUNT}'"
                         println "STORAGECLASS: '${STORAGECLASS}'"
-			println "VOLUMECAPACITY:'${VOLUMECAPACITY}'"
+			println "VOLUMESIZE:'${VOLUMESIZE}'"
 
                         println "-------------------------------------------------"
                         println "-------------------------------------------------"
                         try {
-                           pgbench_build = build job: 'PGBENCH_SCALE_TEST',
-                                parameters: [   [$class: 'StringParameterValue', name: 'NAMESPACE', value: NAMESPACE ],
-                                                [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: TRANSACTIONS ],
-                                                [$class: 'StringParameterValue', name: 'TEMPLATE', value: TEMPLATE ],
-                                                [$class: 'StringParameterValue', name: 'VOLUME_CAPACITY',value: VOLUME_CAPACITY ],
-                                                [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
+                           mongodbycsb_build = build job: 'MONGODB_YCSB_TEST',
+                                parameters: [   [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
+                                                [$class: 'StringParameterValue', name: 'YCSB_THREADS', value: YCSB_THREADS ],
+                                                [$class: 'StringParameterValue', name: 'JUMP_HOST', value: JUMP_HOST ],
+                                                [$class: 'StringParameterValue', name: 'WORKLOAD',value: WORKLOAD ],
                                                 [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
-                                                [$class: 'StringParameterValue', name: 'MODE', value: MODE ],
-                                                [$class: 'StringParameterValue', name: 'CLIENTS', value: CLIENTS ],
-                                                [$class: 'StringParameterValue', name: 'THREADS', value: THREADS ],
-                                                [$class: 'StringParameterValue', name: 'SCALING', value: SCALING ],
-                                                [$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: PBENCHCONFIG ],
-                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ]]
+                                                [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
+                                                [$class: 'StringParameterValue', name: 'OPERATIONCOUNT', value: OPERATIONCOUNT ],
+                                                [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
+                                                [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ]]
                         } catch ( Exception e) {
                         echo "PGBENCH_SCALE_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
