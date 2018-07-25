@@ -5,7 +5,7 @@ println "Current pipeline job build id is '${pipeline_id}'"
 def node_label = 'CCI && ansible-2.3'
 def mongodb_ycsb_test = MONGODB_YCSB_TEST.toString().toUpperCase()
 
-// run pgbench scale test
+// run mongoycsb scale test
 stage ('mongoycsb_scale_test') {
           if ( mongodb_ycsb_test == "TRUE") {
                 currentBuild.result = "SUCCESS"
