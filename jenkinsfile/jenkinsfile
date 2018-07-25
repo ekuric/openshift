@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 
 def pgbench_test = PGBENCH_TEST.toString().toUpperCase() 
-// def pgbench_test_cns_block = PGBENCH_TEST_CNS_BLOCK.toString().toUpperCase() 
+def mongodb_ycsb_test = MONGODB_YCSB_TEST.toString().toUpperCase() 
 
 node {
     // clear workspace
@@ -12,15 +12,9 @@ node {
     // run pgbench 
     if ( pgbench_test == "TRUE" ) {
 	load "openshift/jenkinsfile/ptest.groovy"
-	//pgbench.groovy"
     }
-    //if ( pgbench_test_cns_block == "TRUE" ) {
-    //	load "openshift/jenkinsfile/pgbenchcnsblock.groovy"
-    // } 
-    //if ( mongodb_ycsb_cns_block == "TRUE" ) {
-    // 	load "openshift/jenkinsfile/mongodbycsbblock.groovy"
-    //}  
-    //if ( mongodb_ycsb_cns_file == "TRUE" ) {
-    //	load "openshift/jenkinsfile/mongodbycsbfile.groovy"
-    //} 
+    // run mongo ycsb 
+    if ( mongodb_ycsb_test == "TRUE" ) {
+    	load "openshift/jenkinsfile/mongodbycsb.groovy"
+    }  
 }
