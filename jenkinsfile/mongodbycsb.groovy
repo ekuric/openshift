@@ -21,7 +21,7 @@ stage ('mongoycsb_scale_test') {
                         def MEMORY_LIMIT = mongodbycsb_scale_test_properties['MEMORY_LIMIT']
                         def YCSB_THREADS = mongodbycsb_scale_test_properties['YCSB_THREADS']
                         def WORKLOAD = mongodbycsb_scale_test_properties['WORKLOAD']
-                        def ITERATIONS = mongodbycsb_scale_test_properties['ITERATIONS']
+                        def ITERATION = mongodbycsb_scale_test_properties['ITERATION']
                         def RECORDCOUNT = mongodbycsb_scale_test_properties['RECORDCOUNT']
                         def OPERATIONCOUNT = mongodbycsb_scale_test_properties['OPERATIONCOUNT']
                         def STORAGECLASS = mongodbycsb_scale_test_properties['STORAGECLASS']
@@ -33,7 +33,7 @@ stage ('mongoycsb_scale_test') {
                         println "MEMORY_LIMIT: '${MEMORY_LIMIT}'"
                         println "YCSB_THREADS: '${YCSB_THREADS}'"
                         println "WORKLOAD: '${WORKLOAD}'"
-                        println "ITERATIONS: '${ITERATIONS}'"
+                        println "ITERATION: '${ITERATION}'"
                         println "RECORDCOUNT: '${RECORDCOUNT}'"
                         println "OPERATIONCOUNT: '${OPERATIONCOUNT}'"
                         println "STORAGECLASS: '${STORAGECLASS}'"
@@ -46,7 +46,7 @@ stage ('mongoycsb_scale_test') {
                                 parameters: [   [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
                                                 [$class: 'StringParameterValue', name: 'YCSB_THREADS', value: YCSB_THREADS ],
                                                 [$class: 'StringParameterValue', name: 'WORKLOAD',value: WORKLOAD ],
-                                                [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
+                                                [$class: 'StringParameterValue', name: 'ITERATION', value: ITERATION ],
                                                 [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'OPERATIONCOUNT', value: OPERATIONCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
@@ -85,7 +85,7 @@ stage ('mongoycsb_scale_test') {
                         def MEMORY_LIMIT = mongodbycsb_scale_test_properties['MEMORY_LIMIT']
                         def YCSB_THREADS = mongodbycsb_scale_test_properties['YCSB_THREADS']
                         def WORKLOAD = mongodbycsb_scale_test_properties['WORKLOAD']
-                        def ITERATIONS = mongodbycsb_scale_test_properties['ITERATIONS']
+                        def ITERATION = mongodbycsb_scale_test_properties['ITERATION']
                         def RECORDCOUNT = mongodbycsb_scale_test_properties['RECORDCOUNT']
                         def OPERATIONCOUNT = mongodbycsb_scale_test_properties['OPERATIONCOUNT']
                         def STORAGECLASS = mongodbycsb_scale_test_properties['STORAGECLASS']
@@ -97,7 +97,7 @@ stage ('mongoycsb_scale_test') {
                         println "MEMORY_LIMIT: '${MEMORY_LIMIT}'"
                         println "YCSB_THREADS: '${YCSB_THREADS}'"
                         println "WORKLOAD: '${WORKLOAD}'"
-                        println "ITERATIONS: '${ITERATIONS}'"
+                        println "ITERATION: '${ITERATION}'"
                         println "RECORDCOUNT: '${RECORDCOUNT}'"
                         println "OPERATIONCOUNT: '${OPERATIONCOUNT}'"
                         println "STORAGECLASS: '${STORAGECLASS}'"
@@ -110,7 +110,7 @@ stage ('mongoycsb_scale_test') {
                                 parameters: [   [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
                                                 [$class: 'StringParameterValue', name: 'YCSB_THREADS', value: YCSB_THREADS ],
                                                 [$class: 'StringParameterValue', name: 'WORKLOAD',value: WORKLOAD ],
-                                                [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
+                                                [$class: 'StringParameterValue', name: 'ITERATION', value: ITERATION ],
                                                 [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'OPERATIONCOUNT', value: OPERATIONCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
