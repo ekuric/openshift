@@ -55,20 +55,20 @@ stage ('mongoycsb_scale_test') {
                                                 [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
                                                 [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ]]
                         } catch ( Exception e) {
-                        echo "PGBENCH_SCALE_TEST Job failed with the following error: "
+                        echo "MONGODB_YCSB_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
 			                     echo "Sending an email"
                         mail(
                                 to: 'ekuric@redhat.com',
-                                subject: 'pgbench-scale-test job failed',
+                                subject: 'mongodb-ycsb-test job failed',
                                 body: """\
-                                        Encoutered an error while running the pgbench-scale-test job: ${e.getMessage()}\n\n
+                                        Encoutered an error while running the mongodb-ycsb-test job: ${e.getMessage()}\n\n
                                         Jenkins job: ${env.BUILD_URL}
                         """)
                         currentBuild.result = "FAILURE"
                         sh "exit 1"
                         }
-                        println "PGBENCH_SCALE_TEST build ${pgbench_build.getNumber()} completed successfully"
+                        println "MONGODB_YCSB_TEST build ${mongodbycsb_build.getNumber()} completed successfully"
                 }
         }
 }
@@ -122,20 +122,20 @@ stage ('mongoycsb_scale_test') {
                                                 [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
                                                 [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ]]
                         } catch ( Exception e) {
-                        echo "PGBENCH_SCALE_TEST Job failed with the following error: "
+                        echo "MONGODB_YCSB_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
 			                     echo "Sending an email"
                         mail(
                                 to: 'ekuric@redhat.com',
-                                subject: 'pgbench-scale-test job failed',
+                                subject: 'mongodb-ycsb-test job failed',
                                 body: """\
-                                        Encoutered an error while running the pgbench-scale-test job: ${e.getMessage()}\n\n
+                                        Encoutered an error while running the mongodb-ycsb-test job: ${e.getMessage()}\n\n
                                         Jenkins job: ${env.BUILD_URL}
                         """)
                         currentBuild.result = "FAILURE"
                         sh "exit 1"
                         }
-                        println "PGBENCH_SCALE_TEST build ${pgbench_build.getNumber()} completed successfully"
+                        println "MONGODB_YCSB_TEST build ${mongodbycsb_build.getNumber()} completed successfully"
                 }
         }
 }
