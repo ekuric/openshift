@@ -20,7 +20,6 @@ stage ('mongoycsb_scale_test') {
 			def mongodbycsb_scale_test_properties = readProperties file: "mongodbycsb.properties"
                         def MEMORY_LIMIT = mongodbycsb_scale_test_properties['MEMORY_LIMIT']
                         def YCSB_THREADS = mongodbycsb_scale_test_properties['YCSB_THREADS']
-                        def JUMP_HOST = mongodbycsb_scale_test_properties['JUMP_HOST']
                         def WORKLOAD = mongodbycsb_scale_test_properties['WORKLOAD']
                         def ITERATIONS = mongodbycsb_scale_test_properties['ITERATIONS']
                         def RECORDCOUNT = mongodbycsb_scale_test_properties['RECORDCOUNT']
@@ -33,7 +32,6 @@ stage ('mongoycsb_scale_test') {
                         println "-------------------------------------------------"
                         println "MEMORY_LIMIT: '${MEMORY_LIMIT}'"
                         println "YCSB_THREADS: '${YCSB_THREADS}'"
-                        println "JUMP_HOST: '${JUMP_HOST}'"
                         println "WORKLOAD: '${WORKLOAD}'"
                         println "ITERATIONS: '${ITERATIONS}'"
                         println "RECORDCOUNT: '${RECORDCOUNT}'"
@@ -47,7 +45,6 @@ stage ('mongoycsb_scale_test') {
                            mongodbycsb_build = build job: 'MONGODB_YCSB_TEST',
                                 parameters: [   [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
                                                 [$class: 'StringParameterValue', name: 'YCSB_THREADS', value: YCSB_THREADS ],
-                                                [$class: 'StringParameterValue', name: 'JUMP_HOST', value: JUMP_HOST ],
                                                 [$class: 'StringParameterValue', name: 'WORKLOAD',value: WORKLOAD ],
                                                 [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
                                                 [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
@@ -87,7 +84,6 @@ stage ('mongoycsb_scale_test') {
 			def mongodbycsb_scale_test_properties = readProperties file: "mongodbycsbblock.properties"
                         def MEMORY_LIMIT = mongodbycsb_scale_test_properties['MEMORY_LIMIT']
                         def YCSB_THREADS = mongodbycsb_scale_test_properties['YCSB_THREADS']
-                        def JUMP_HOST = mongodbycsb_scale_test_properties['JUMP_HOST']
                         def WORKLOAD = mongodbycsb_scale_test_properties['WORKLOAD']
                         def ITERATIONS = mongodbycsb_scale_test_properties['ITERATIONS']
                         def RECORDCOUNT = mongodbycsb_scale_test_properties['RECORDCOUNT']
@@ -100,7 +96,6 @@ stage ('mongoycsb_scale_test') {
                         println "-------------------------------------------------"
                         println "MEMORY_LIMIT: '${MEMORY_LIMIT}'"
                         println "YCSB_THREADS: '${YCSB_THREADS}'"
-                        println "JUMP_HOST: '${JUMP_HOST}'"
                         println "WORKLOAD: '${WORKLOAD}'"
                         println "ITERATIONS: '${ITERATIONS}'"
                         println "RECORDCOUNT: '${RECORDCOUNT}'"
@@ -114,7 +109,6 @@ stage ('mongoycsb_scale_test') {
                            mongodbycsb_build = build job: 'MONGODB_YCSB_TEST',
                                 parameters: [   [$class: 'StringParameterValue', name: 'MEMORY_LIMIT', value: MEMORY_LIMIT ],
                                                 [$class: 'StringParameterValue', name: 'YCSB_THREADS', value: YCSB_THREADS ],
-                                                [$class: 'StringParameterValue', name: 'JUMP_HOST', value: JUMP_HOST ],
                                                 [$class: 'StringParameterValue', name: 'WORKLOAD',value: WORKLOAD ],
                                                 [$class: 'StringParameterValue', name: 'ITERATIONS', value: ITERATIONS ],
                                                 [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
