@@ -13,7 +13,7 @@ stage ('mongoycsb_scale_test') {
                         // get properties file
                         if (fileExists("mongodbycsb.properties")) {
                                 println "mongodbycsb.properties... deleting it..."
-                                sh "mongodbycsb.properties"
+                                sh "rm mongodbycsb.properties"
                         }
                         sh "wget -O mongodbycsb.properties ${MONGOYCSB_PROPERTY_FILE}"
                         sh "cat mongodbycsb.properties"
@@ -80,7 +80,7 @@ stage ('mongoycsb_scale_test') {
                         // get properties file
                         if (fileExists("mongodbycsbblock.properties")) {
                                 println "mongodbycsbblock.properties... deleting it..."
-                                sh "mongodbycsbblock.properties"
+                                sh "rm mongodbycsbblock.properties"
                         }
                         sh "wget -O mongodbycsbblock.properties ${MONGOYCSB_BLOCK_PROPERTY_FILE}"
                         sh "cat mongodbycsbblock.properties"
