@@ -6,7 +6,7 @@ def node_label = 'CCI && ansible-2.3'
 def mongodb_ycsb_test = MONGODB_YCSB_TEST.toString().toUpperCase()
 
 // run mongoycsb scale test
-stage ('mongoycsb_scale_test') {
+stage ('mongoycsb_scale_test_glusterfs') {
           if ( mongodb_ycsb_test == "TRUE") {
                 currentBuild.result = "SUCCESS"
 		node('CCI && US') {
@@ -70,7 +70,7 @@ stage ('mongoycsb_scale_test') {
         }
 }
 
-stage ('mongoycsb_scale_test') {
+stage ('mongoycsb_scale_test_gluster_block') {
           if ( mongodb_ycsb_test == "TRUE") {
                 currentBuild.result = "SUCCESS"
 		node('CCI && US') {

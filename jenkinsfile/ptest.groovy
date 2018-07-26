@@ -4,10 +4,9 @@ def pipeline_id = env.BUILD_ID
 println "Current pipeline job build id is '${pipeline_id}'"
 def node_label = 'CCI && ansible-2.3'
 def pgbench_test = PGBENCH_TEST.toString().toUpperCase()
-// def pgbench_test_cns_block = PGBENCH_TEST_CNS_BLOCK.toString().toUpperCase()
 
 // run pgbench scale test
-stage ('pgbench_scale_test') {
+stage ('pgbench_scale_test_glusterfs') {
           if ( pgbench_test == "TRUE") {
                 currentBuild.result = "SUCCESS"
 		node('CCI && US') {
@@ -97,7 +96,7 @@ stage ('pgbench_scale_test') {
 }
 
 // run pgbench gluster-block scale test
-stage ('pgbench_scale_test_cns_block') {
+stage ('pgbench_scale_test_gluster_block') {
           if ( pgbench_test == "TRUE") {
                 currentBuild.result = "SUCCESS"
 		node('CCI && US') {
