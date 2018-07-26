@@ -79,7 +79,7 @@ stage ('mongoycsb_scale_test_gluster_block') {
                                 println "mongodbycsbblock.properties... deleting it..."
                                 sh "rm mongodbycsbblock.properties"
                         }
-                        sh "wget -O mongodbycsbblock.properties ${MONGOYCSB_BLOCK_PROPERTY_FILE}"
+                        sh "wget -O mongodbycsbblock.properties ${MONGOYCSB_PROPERTY_FILE_GLUSTER_BLOCK}"
                         sh "cat mongodbycsbblock.properties"
 			def mongodbycsb_scale_test_properties = readProperties file: "mongodbycsbblock.properties"
                         def MEMORY_LIMIT = mongodbycsb_scale_test_properties['MEMORY_LIMIT']

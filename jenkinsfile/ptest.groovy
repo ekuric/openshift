@@ -15,11 +15,6 @@ stage ('pgbench_scale_test_glusterfs') {
                                 println "pgbench_scale_test.properties file exist... deleting it..."
                                 sh "rm pgbench.properties"
                         }
-                        // get properties file - from test location
-                        // in SCALE-CI there will be defined PGBENCH_SCALE_TEST_PROPERTY_FILE
-                        // for now just keep it as is --
-
-                        // sh "wget https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/pgbench.properties"
                         sh "wget -O pgbench.properties ${PGBENCH_PROPERTY_FILE}"
                         sh "cat pgbench.properties"
 			def pgbench_scale_test_properties = readProperties file: "pgbench.properties"
@@ -57,11 +52,6 @@ stage ('pgbench_scale_test_glusterfs') {
 
                         println "-------------------------------------------------"
                         println "-------------------------------------------------"
-
-
-                        // Runing pgbench stress test
-                        // PGBENCH_SCALE_TEST is actually name of jenkins job - it must be configured in advance
-                        // [$class: 'LabelParameterValue', name: 'node', label: node_label ],
                         try {
                            pgbench_build = build job: 'PGBENCH_SCALE_TEST',
                                 parameters: [   [$class: 'StringParameterValue', name: 'NAMESPACE', value: NAMESPACE ],
@@ -105,12 +95,7 @@ stage ('pgbench_scale_test_gluster_block') {
                                 println "pgbench_cns_block.properties file exist... deleting it..."
                                 sh "rm pgbench_cns_block.properties"
                         }
-                        // get properties file - from test location
-                        // in SCALE-CI there will be defined PGBENCH_SCALE_TEST_PROPERTY_FILE
-                        // for now just keep it as is --
-
-                        // sh "wget https://raw.githubusercontent.com/ekuric/openshift/master/postgresql/pgbench.properties"
-                        sh "wget -O pgbench_cns_block.properties ${PGBENCH_PROPERTY_FILE_CNS_BLOCK}"
+                        sh "wget -O pgbench_cns_block.properties ${PGBENCH_PROPERTY_FILE_GLUSTER_BLOCK}"
                         sh "cat pgbench_cns_block.properties"
 			def pgbench_scale_test_properties = readProperties file: "pgbench_cns_block.properties"
                         def NAMESPACE = pgbench_scale_test_properties['NAMESPACE']
@@ -147,12 +132,8 @@ stage ('pgbench_scale_test_gluster_block') {
 
                         println "-------------------------------------------------"
                         println "-------------------------------------------------"
-
-
-                        // Runing pgbench stress test
-                        // PGBENCH_SCALE_TEST is actually name of jenkins job - it must be configured in advance
-                        // [$class: 'LabelParameterValue', name: 'node', label: node_label ],
-                        try {
+                        
+			try {
                            pgbench_build = build job: 'PGBENCH_SCALE_TEST',
                                 parameters: [   [$class: 'StringParameterValue', name: 'NAMESPACE', value: NAMESPACE ],
                                                 [$class: 'StringParameterValue', name: 'TRANSACTIONS', value: TRANSACTIONS ],
