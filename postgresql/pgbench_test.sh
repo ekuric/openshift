@@ -271,7 +271,7 @@ case $mode in
     ;;
     cnsfile)
         create_pod
-        volume_setup
+        #volume_setup
         run_test
         draw_result 
 	delete_project
