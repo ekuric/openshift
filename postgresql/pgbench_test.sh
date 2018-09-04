@@ -253,6 +253,7 @@ function volume_setup {
 
 function delete_project {
     oc project default 
+    oc delete dc -n $namespace --all 
     oc delete pods -n $namespace --all 
     oc delete pvc -n $namespace --all 
     oc delete project $namespace
