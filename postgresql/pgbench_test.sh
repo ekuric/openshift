@@ -278,7 +278,7 @@ case $mode in
 	delete_project
     ;;
     otherstorage)
-	delete_project
+	#delete_project
         create_pod
         run_test
 	delete_project
