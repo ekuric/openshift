@@ -281,5 +281,6 @@ case $mode in
 	delete_project
         create_pod
         run_test
+	delete_project
         #draw_result 
 esac 
