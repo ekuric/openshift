@@ -26,7 +26,6 @@ stage ('mongoycsb_scale_test_glusterfs') {
                         def OPERATIONCOUNT = mongodbycsb_scale_test_properties['OPERATIONCOUNT']
                         def STORAGECLASS = mongodbycsb_scale_test_properties['STORAGECLASS']
 			def VOLUMESIZE = mongodbycsb_scale_test_properties['VOLUMESIZE']
-			def PBENCHCONFIG = mongodbycsb_scale_test_properties['PBENCHCONFIG']
                         // debug info
                         println "----------USER DEFINED OPTIONS-------------------"
                         println "-------------------------------------------------"
@@ -39,7 +38,6 @@ stage ('mongoycsb_scale_test_glusterfs') {
                         println "OPERATIONCOUNT: '${OPERATIONCOUNT}'"
                         println "STORAGECLASS: '${STORAGECLASS}'"
 			println "VOLUMESIZE:'${VOLUMESIZE}'"
-			println "PBENCHCONFIG:'${PBENCHCONFIG}'" 
 
                         println "-------------------------------------------------"
                         println "-------------------------------------------------"
@@ -52,8 +50,7 @@ stage ('mongoycsb_scale_test_glusterfs') {
                                                 [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'OPERATIONCOUNT', value: OPERATIONCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
-                                                [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ],
-						[$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: PBENCHCONFIG ]]
+                                                [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ]]
                         } catch ( Exception e) {
                         echo "MONGODB_YCSB_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
@@ -93,7 +90,6 @@ stage ('mongoycsb_scale_test_gluster_block') {
                         def OPERATIONCOUNT = mongodbycsb_scale_test_properties['OPERATIONCOUNT']
                         def STORAGECLASS = mongodbycsb_scale_test_properties['STORAGECLASS']
 			def VOLUMESIZE = mongodbycsb_scale_test_properties['VOLUMESIZE']
-			def PBENCHCONFIG = mongodbycsb_scale_test_properties['PBENCHCONFIG']
                         // debug info
                         println "----------USER DEFINED OPTIONS-------------------"
                         println "-------------------------------------------------"
@@ -106,7 +102,6 @@ stage ('mongoycsb_scale_test_gluster_block') {
                         println "OPERATIONCOUNT: '${OPERATIONCOUNT}'"
                         println "STORAGECLASS: '${STORAGECLASS}'"
 			println "VOLUMESIZE:'${VOLUMESIZE}'"
-			println "PBENCHCONFIG:'${PBENCHCONFIG}'"
 
                         println "-------------------------------------------------"
                         println "-------------------------------------------------"
@@ -119,8 +114,7 @@ stage ('mongoycsb_scale_test_gluster_block') {
                                                 [$class: 'StringParameterValue', name: 'RECORDCOUNT', value: RECORDCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'OPERATIONCOUNT', value: OPERATIONCOUNT ],
                                                 [$class: 'StringParameterValue', name: 'STORAGECLASS', value: STORAGECLASS ],
-                                                [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ]
-						[$class: 'StringParameterValue', name: 'PBENCHCONFIG', value: PBENCHCONFIG ]]
+                                                [$class: 'StringParameterValue', name: 'VOLUMESIZE', value: VOLUMESIZE ]]
                         } catch ( Exception e) {
                         echo "MONGODB_YCSB_TEST Job failed with the following error: "
                         echo "${e.getMessage()}"
