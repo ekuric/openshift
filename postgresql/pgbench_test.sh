@@ -142,7 +142,7 @@ function create_pod {
 } 
 
 function run_test { 
-        POD=$(oc get pods -n $namespac | grep postgresql | grep -v deploy | awk '{print $1}')
+        POD=$(oc get pods -n $namespace | grep postgresql | grep -v deploy | awk '{print $1}')
         printf "Running test preparation\n"
 	    sleep 120 
 	# 
