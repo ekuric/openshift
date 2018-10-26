@@ -142,7 +142,7 @@ function create_pod {
 } 
 
 function run_test { 
-        POD=$(oc get pods -n $namespace | grep postgresql | grep -v deploy | awk '{print $1}')
+        POD=$(oc get pods -n $namespac | grep postgresql | grep -v deploy | awk '{print $1}')
         printf "Running test preparation\n"
 	    sleep 120 
 	# 
@@ -202,7 +202,9 @@ function draw_result {
 
 # function to setup profile 
 
-function profile_setup {
+function profile_setup_block {
+
+    local pvvolume=$(oc describe pvc -n $namespace $(oc get pvc -n $namespace | grep postgresql  | awk '{print $1}' ) | grep Volume: | cut -d':' -f2 | awk '{print $1}')
     local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) \
 	    --user admin --secret $(oc get secret -n $(oc get pods --all-namespaces | grep glusterfs-storage | awk '{print $1}'| head -1)  heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode) volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
@@ -213,7 +215,23 @@ function profile_setup {
 
 }
 
+
+function profile_setup_file {
+    # profile setup for glusterfs storage backend 
+    
+    local pvvolume=$(oc describe pvc -n $namespace $(oc get pvc -n $namespace | grep postgresql  | awk '{print $1}' ) | grep Volume: | cut -d':' -f2 | awk '{print $1}')
+    CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
+    CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
+
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume start 
+    oc exec -n $CNSPOJECT $CNSPOD -- gluster volume profile $block_volume info clear
+
+}
+
 function collect_profile {
+
+    # we need a way to find on which PV is located PVC 
+    
 
     local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) \
             --user admin --secret $(oc get secret -n $(oc get pods --all-namespaces | grep glusterfs-storage | awk '{print $1}'| head -1)  heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode) volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
@@ -281,6 +299,6 @@ case $mode in
 	#delete_project
         create_pod
         run_test
+	draw_results
 	delete_project
-        #draw_result 
 esac 
