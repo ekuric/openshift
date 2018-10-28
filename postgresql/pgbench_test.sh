@@ -233,7 +233,7 @@ function collect_profile {
     # we need a way to find on which PV is located PVC 
     
     #local block_volume=$(heketi-cli -s $(oc get storageclass glusterfs-storage-block  -o yaml  | grep resturl | cut -d' ' -f4) \
-            --user admin --secret $(oc get secret -n $(oc get pods --all-namespaces | grep glusterfs-storage | awk '{print $1}'| head -1)  heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode) volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
+    #        --user admin --secret $(oc get secret -n $(oc get pods --all-namespaces | grep glusterfs-storage | awk '{print $1}'| head -1)  heketi-storage-admin-secret -o yaml | grep key | awk '{print $2}' | base64 --decode) volume list | grep block  | awk '{print $3}' | cut -d':' -f2)
     CNSPOJECT=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $1}'  | head -1)
     CNSPOD=$(oc get pods --all-namespaces  | grep glusterfs-storage | awk '{print $2}'  | head -1)
 
