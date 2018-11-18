@@ -2,7 +2,7 @@
 
 # Script to to run pgbench load test against postgresql pod in kubernetes/Openshift
   
-opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "draw:,namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:,clients:,scaling:,threads:,storageclass:" -n "getopt.sh" -- "$@");
+opts=$(getopt -q -o n:t:e:v:m:i:r: --longoptions "draw:,namespace:,transactions:,template:,volsize:,memsize:,iterations:,mode:,resultdir:,clients:,scaling:,threads:,storageclass:,delproject:" -n "getopt.sh" -- "$@");
 
 if [ $? -ne 0 ]; then
     printf -- "$*\n"
@@ -22,6 +22,7 @@ if [ $? -ne 0 ]; then
     printf -- "\t\t --threads - number of pgbench threads\n"
     printf -- "\t\t --storageclass - name of storageclass to use to allocate storage\n"
     printf -- "\t\t --draw - wheather or not to draw results"
+    printf -- "\t\t --delproject - wheather to delete project at end or not\n" 
     exit 1 
 fi
 
@@ -122,6 +123,14 @@ while true; do
                 shift; 
             fi
         ;;
+	--delproject)
+		shift; 
+		if [ -n "$1" ]; then 
+			deproject="$1"
+			shift;
+		fi 
+	;;
+
         --)
             break;
         ;;
@@ -272,12 +281,17 @@ function volume_setup {
 }
 
 function delete_project {
-    oc project default 
-    oc delete dc -n $namespace --all 
-    oc delete pods -n $namespace --all 
-    oc delete pvc -n $namespace --all 
-    oc delete project $namespace
-    sleep 180
+	if [[ ${delproject}=="yes" ]]; then
+		oc project default 
+		oc delete dc -n $namespace --all 
+		oc delete pods -n $namespace --all 
+		oc delete pvc -n $namespace --all 
+		oc delete project $namespace
+		sleep 180
+	else 
+		printf "Project will not be deleted ... will stay there\n"
+		sleep 180
+	fi 
 }
 
 # necessary to polish this ... 
@@ -302,6 +316,6 @@ case $mode in
 	#delete_project
         create_pod
         run_test
-	draw_results
+	draw_result
 	delete_project
 esac 
