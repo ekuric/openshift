@@ -161,6 +161,43 @@ class Openshift(object):
                                   int(time.mktime(time.strptime(pod["status"]["containerStatuses"][0]["state"]["running"]["startedAt"],'%Y-%m-%dT%H:%M:%SZ'))),
                                   pod["status"]["containerStatuses"][0]["state"]["running"]["startedAt"],
                                   pod["metadata"]["namespace"], pod["spec"]["volumes"][0]["persistentVolumeClaim"]["claimName"]])
+                                  
+
+    # we have to also get state when pods were in "Ready" status
+    def pod_read(self, namespace=None):
+        if namespace:
+            self.namespace = ns
+        
+        api_pods = '%s/namespaces/%s/pods' % (self.base_api, self.namespace)
+        parsed_json = self.get_json(api_pods)
+        pods = []
+
+        # sort pods on time when they were first time "Ready"
+        for item in parsed_json["items"]:
+            pods.append(item)
+            pods = sorted(pods, key=lambda k: k["status"]["conditions"][1]["lastTransitionTime"], reverse=False)
+            with open("pods_" + str(ns) + ".json", "w") as startpod:
+                json.dump(pods,startpod, indent=4)
+
+
+            with open("pods_ready" + str(ns) + ".csv", "wb") as pods_ready:
+                pods_ready_out = csv.writer(pods_ready, delimiter=",")
+                pods_ready_out.writerow(['Pod Name', "Pod Create Time", "Pod Create Time - TZ",
+                              "Pod StartTime", "Pod StartTime - TZ", "Pod StartedAt Time",
+                              "Pod StartedAt Time - TZ", "Pod Ready-TZ", 
+                              "Pod-Ready", "Pod Namespace", "PVC Name"])
+
+
+                for pod in pods:
+                    pods_ready_out.writerow([pod["metadata"]["name"], int(time.mktime(time.strptime(pod["metadata"]["creationTimestamp"], '%Y-%m-%dT%H:%M:%SZ'))),
+                                  pod["metadata"]["creationTimestamp"],
+                                  int(time.mktime(time.strptime(pod["status"]["startTime"],'%Y-%m-%dT%H:%M:%SZ'))),
+                                  pod["status"]["startTime"],
+                                  int(time.mktime(time.strptime(pod["status"]["containerStatuses"][0]["state"]["running"]["startedAt"], '%Y-%m-%dT%H:%M:%SZ'))),
+                                  pod["status"]["containerStatuses"][0]["state"]["running"]["startedAt"],
+				                  int(time.mktime(time.strptime(pod["status"]["conditions"][1]["lastTransitionTime"], '%Y-%m-%dT%H:%M:%SZ'))),
+				                  pod["status"]["conditions"][1]["lastTransitionTime"],
+                                  pod["metadata"]["namespace"], pod["spec"]["volumes"][0]["persistentVolumeClaim"]["claimName"]])
 
 if __name__ == "__main__":
 
@@ -180,6 +217,7 @@ if __name__ == "__main__":
 
     if args.check_pods:
         myos.get_pods()
+        myos.pod_read()
 
     if args.check_pv:
         myos.get_pv()
@@ -188,5 +226,6 @@ if __name__ == "__main__":
         myos.get_pv()
         myos.get_pvc()
         myos.get_pods()
+        myos.pod_read() 
 
 
