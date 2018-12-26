@@ -35,6 +35,17 @@
                 },
                 "name": "${DATABASE_SERVICE_NAME}"
             },
+	  {
+	    "apiVersion": "v1",
+    	    "kind": "Secret",
+    	    "metadata": {
+      		"name": "ceph-secret-e",
+      	    "data": {
+        	"key": "QVFBMXNncGNDZVZMQWhBQUl6bTFQUVRmWW55clR3QXFqNG1TdGc9PQ=="
+      	     },
+      	    "type": "kubernetes.io/rbd"
+    	    }
+  	},
             "stringData": {
                 "database-name": "${POSTGRESQL_DATABASE}",
                 "database-password": "${POSTGRESQL_PASSWORD}",
