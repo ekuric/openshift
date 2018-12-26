@@ -144,8 +144,8 @@ done
 function create_pod {
         oc new-project $namespace 
 	# temporary 
-	curl -o cephsec.json https://gist.githubusercontent.com/ekuric/cfb26866d839e52cefd0d2729948ac17/raw/c9c12d7bc5274aed4b1ba769009d831ad2c2b7e8/gistfile1.txt
-	oc create -f cephsec.json 
+	curl -o cephsec.yaml https://gist.githubusercontent.com/ekuric/cfb26866d839e52cefd0d2729948ac17/raw/d52f288bb30dbb92115bc9f8d4ecb79135f333f7/gistfile1.txt
+	oc create -f cephsec.yaml 
         oc new-app --template=$template -p VOLUME_CAPACITY=${volsize}Gi -p MEMORY_LIMIT=${memsize} -p STORAGE_CLASS=${storageclass}
         while [ "$(oc get pods -n $namespace | grep -v deploy | awk '{print $3}' | grep -v STATUS)" != "Running" ] ; do 
 	        sleep 5
