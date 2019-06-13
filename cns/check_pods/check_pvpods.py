@@ -6,6 +6,7 @@ import requests
 import csv
 import json
 import time
+import os
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -32,9 +33,11 @@ parser.add_argument("-ns", help="The namespace where to look for parameters")
 parser.add_argument("--check_pvc", action='store_true', help='Get list of PVCs elemements in desired namespace')
 parser.add_argument("--check_pv", help="List of PV volumes", action='store_true')
 parser.add_argument("--check_all", help="collect data for PV/PVC and PODS information ... ", action='store_true')
+parser.add_argument("--resdir", help="result dir", type=str)
 
 args = parser.parse_args()
 ns = args.ns
+resdir = args.resdir
 
 class Openshift(object):
 
@@ -55,12 +58,23 @@ class Openshift(object):
         self.verbose = verbose
         self.namespace = namespace
         self.base_api = base_api.rstrip('/')
+        self.resdir = str(resdir)
 
         if token:
             self.token = token
 
-    def get_json(self, url):
+	if resdir:
+	   self.resdir=resdir
+        try:
+           if not os.path.exists(self.resdir):
+             os.mkdir(self.resdir)
+        except OSError:
+           print ("Directory creation:", self.resdir, "failed")
+        else:
+           print ("Directory:", self.resdir, "created succesfully")
 
+    def get_json(self, url):
+	
         headers = {"Authorization": 'Bearer %s' % self.token}
         try:
             r = requests.get('https://%s:%s%s' % (self.host, self.port, url),
@@ -78,9 +92,10 @@ class Openshift(object):
 
     # get all PVC from particular namespace
     def get_pvc(self, namespace=None):
+	
 
         if namespace:
-            self.namespace = ns
+          self.namespace = ns
         api_pvc = '%s/namespaces/%s/persistentvolumeclaims' % (self.base_api, self.namespace)
         parsed_json = self.get_json(api_pvc)
         pvc_claims = []
@@ -89,12 +104,12 @@ class Openshift(object):
             pvc_claims.append(item)
             pvc_claims = sorted(pvc_claims, key=lambda k: k['metadata']['creationTimestamp'],reverse=False)
 
-            with open("pvc_"+str(ns)+".json", "w") as allpvc:
+            with open(self.resdir+"/""pvc_"+str(ns)+".json", "w") as allpvc:
                 json.dump(pvc_claims, allpvc, indent=4)
 
         # sorted - get stuff properly printed
 
-        with open("pvc_"+str(ns)+".csv", 'wb') as cvsout:
+        with open(self.resdir+"/""pvc_"+str(ns)+".csv", 'wb') as cvsout:
             csv_out = csv.writer(cvsout)
             csv_out.writerow(['PVC Name', 'PVC Size' 'PVC Create Time','PVC Create Time - TZ' 'PVC Namespace'])
             for pvc in pvc_claims:
@@ -116,11 +131,11 @@ class Openshift(object):
         for item in parsed_json["items"]:
             pv_volumes.append(item)
             pv_volumes = sorted(pv_volumes, key=lambda k: k['metadata']['creationTimestamp'], reverse=False)
-            with open("pv_"+str(ns)+".json", "w") as allpv:
+            with open(self.resdir+"/""pv_"+str(ns)+".json", "w") as allpv:
                 json.dump(pv_volumes, allpv, indent=4)
 
 
-        with open("pv_"+str(ns)+".csv", 'wb') as csv_pv:
+        with open(self.resdir+"/""pv_"+str(ns)+".csv", 'wb') as csv_pv:
             csv_out = csv.writer(csv_pv)
             csv_out.writerow(['PV Name', 'PVC Name', 'PV Size', 'PV Create Time', 'PV Create Time - TZ', 'PV Namespace'])
             for pv in pv_volumes:
@@ -138,15 +153,16 @@ class Openshift(object):
         api_pods = '%s/namespaces/%s/pods' % (self.base_api, self.namespace)
         parsed_json = self.get_json(api_pods)
         pods = []
+	
 
         # sort pods based on creationTime
         for item in parsed_json["items"]:
             pods.append(item)
             pods = sorted(pods, key=lambda k: k["status"]["containerStatuses"][0]["state"]["running"]["startedAt"],reverse=False)
-            with open("pods_"+str(ns)+".json", "w") as allpods:
+            with open(self.resdir+"/""pods_"+str(ns)+".json", "w") as allpods:
                 json.dump(pods,allpods, indent=4)
 
-        with open("pods_"+str(ns)+".csv", 'wb') as csv_pods:
+        with open(self.resdir+"/""pods_"+str(ns)+".csv", 'wb') as csv_pods:
             csv_out = csv.writer(csv_pods,delimiter=",")
             csv_out.writerow(['Pod Name', "Pod Create Time", "Pod Create Time - TZ",
                               "Pod StartTime", "Pod StartTime - TZ", "Pod StartedAt Time",
