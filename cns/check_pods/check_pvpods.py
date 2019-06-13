@@ -218,6 +218,7 @@ if __name__ == "__main__":
     if args.check_pods:
         myos.get_pods()
         myos.pod_read()
+        myos.get_pvc()
 
     if args.check_pv:
         myos.get_pv()
